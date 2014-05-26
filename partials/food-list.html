@@ -1,7 +1,7 @@
 <div class="content float-left" ng-controller="FoodListCtrl">
-  <div ng-class="{'card': true, 'show-back': selectedItem == $index}"
+  <div ng-class="{'card': true, 'show-back': selectedItem == food.id}"
        ng-repeat="food in foods | orderBy : getDaysToExpiry"
-       ng-click="itemClicked($index)">
+       ng-click="itemClicked(food)">
     <div class="card-front">
       <div class="left one-third status">
         <h1 ng-class="{'expire-3': getDaysToExpiry(food) < 1,
@@ -20,7 +20,7 @@
         <div class="cancel">Cancel</div>
       </div>
       <div class="right two-thirds">
-        <div class="remove" ng-click="itemRemoved($index)">
+        <div class="remove" ng-click="itemRemoved(food)">
           <div class="remove-button">
             Remove Item
           </div>

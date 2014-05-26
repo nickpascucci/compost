@@ -12,7 +12,6 @@ compostControllers.factory(
          var service = {
              model: [],
              saveState: function () {
-                 console.log("Saving model: " + JSON.stringify(service.model));
                  localStorage[storageKey] = angular.toJson(service.model);
              },
              loadState: function () {
@@ -36,22 +35,28 @@ compostControllers.factory(
 compostControllers.controller("FoodListCtrl", function ($scope, modelService) {
     $scope.foods = modelService.model;
 
-    $scope.selectedItem = -1;
+    // ID of selected item.
+    $scope.selectedItem = 0;
 
     // When an item is clicked, switch sides.
-    $scope.itemClicked = function ($index) {
-        if ($scope.selectedItem != $index) {
-            $scope.selectedItem = $index;
+    $scope.itemClicked = function (food) {
+        if ($scope.selectedItem != food.id) {
+            $scope.selectedItem = food.id;
         } else {
-            $scope.selectedItem = -1;
+            $scope.selectedItem = 0;
         }
     };
 
     // When the "Remove" button is clicked, remove the element.
-    $scope.itemRemoved = function ($index) {
-        $scope.foods.splice($index, 1);
-        $scope.selectedItem = -1;
-        modelService.saveState();
+    $scope.itemRemoved = function (food) {
+        index = indexOf(food, $scope.foods);
+        if (index == -1) {
+            console.err("No such element: " + food.id);
+        } else {
+            $scope.foods.splice(index, 1);
+            $scope.selectedItem = 0;
+            modelService.saveState();
+        }
     };
 
     $scope.getAge = function (food) {
@@ -73,6 +78,17 @@ compostControllers.controller("FoodListCtrl", function ($scope, modelService) {
     }
 });
 
+function indexOf(item, items) {
+    var index = -1;
+    for (i in items) {
+        if (items[i].id == item.id) {
+            index = i;
+            break;
+        }
+    }
+    return index;
+}
+
 /*
   Controller for the add view.
 */
@@ -80,6 +96,7 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, modelS
     $scope.now = moment().startOf("day");
     $scope.daysToExpiry = 0;
     $scope.food = {
+        "id": moment().unix(),
         "name": "New Food",
         "created": momentToIsoString(moment().startOf("day")),
         "expiresOn": momentToIsoString(moment().startOf("day"))
