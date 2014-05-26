@@ -7,7 +7,7 @@
         <h1 ng-class="{'expire-3': getDaysToExpiry(food) < 1,
                        'expire-2': getDaysToExpiry(food) < 3,
                        'expire-1': getDaysToExpiry(food) >= 3}">{{getDaysToExpiry(food)}}</h1>
-        Days
+        Days Left
       </div>
       <div class="right two-thirds description">
         <h1>{{food.name}}</h1>
@@ -16,8 +16,16 @@
       </div>
     </div>
     <div class="card-back">
-      <div class="cancel">Cancel</div>
-      <div class="remove" ng-click="itemRemoved($index)">Remove</div>
+      <div class="left one-third">
+        <div class="cancel">Cancel</div>
+      </div>
+      <div class="right two-thirds">
+        <div class="remove" ng-click="itemRemoved($index)">
+          <div class="remove-button">
+            Remove Item
+          </div>
+        </div>
+      </div>
     </div>
   </div>
   <a href="#/add">
