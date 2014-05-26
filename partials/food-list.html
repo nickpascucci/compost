@@ -1,10 +1,12 @@
 <div class="content float-left" ng-controller="FoodListCtrl">
   <div ng-class="{'card': true, 'show-back': selectedItem == $index}"
-       ng-repeat="food in foods"
+       ng-repeat="food in foods | orderBy : getDaysToExpiry"
        ng-click="itemClicked($index)">
     <div class="card-front">
       <div class="left one-third status">
-        <h1 class="expire-3">{{getDaysToExpiry(food)}}</h1>
+        <h1 ng-class="{'expire-3': getDaysToExpiry(food) < 1,
+                       'expire-2': getDaysToExpiry(food) < 3,
+                       'expire-1': getDaysToExpiry(food) >= 3}">{{getDaysToExpiry(food)}}</h1>
         Days
       </div>
       <div class="right two-thirds description">

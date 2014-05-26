@@ -3,7 +3,9 @@
     <input class="food-name" type="text" placeholder="Name" ng-model="food.name" autofocus/>
     <div class="expiration">
       Expires in
-      <div class="expire-1">
+      <div ng-class="{'expire-3': daysToExpiry < 1,
+                   'expire-2': daysToExpiry < 3,
+                   'expire-1': daysToExpiry >= 3}">
         {{daysToExpiry}}
       </div>
       days
