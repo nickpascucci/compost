@@ -78,6 +78,7 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, modelS
     $scope.now = new Date();
     $scope.daysToExpiry = 0;
     $scope.food = {
+        "name": "New Food",
         "created": dateToIsoString(new Date()),
         "expiresOn": dateToIsoString(new Date())
     };
@@ -86,6 +87,10 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, modelS
     $scope.save = function () {
         modelService.model.push($scope.food);
         modelService.saveState();
+        $location.path("/foods");
+    };
+
+    $scope.cancel = function () {
         $location.path("/foods");
     };
 

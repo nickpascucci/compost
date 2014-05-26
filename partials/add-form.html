@@ -10,8 +10,9 @@
       </div>
       days
     </div>
+    <div class="cancel-button" ng-click="cancel()">Cancel</div>
   </div>
-  <div class="right half left-border">
+  <div class="right half">
     <input class="expiration-date" type="date" ng-model="food.expiresOn"
            ng-change="onDateChanged()"/>
     <div class="save-button" ng-click="save()">Save</div>
