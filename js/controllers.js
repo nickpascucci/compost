@@ -1,36 +1,30 @@
 var compostControllers = angular.module("compostControllers", []);
 
 var storageKey = "ModelData";
-model = [// {"name": "Brussels Sprouts",
-        //  "age": 4,
-        //  "expiresIn": 0},
-        // {"name": "Tomato Sauce",
-        //  "age": 2,
-        //  "expiresIn": 3},
-        // {"name": "Italian Sausage",
-        //  "age": 0,
-        //  "expiresIn": 10}
-        ];
 
 /*
   A service for persisting and reloading state from Local Storage.
 */
 compostControllers.factory(
-    "localStorageService",
+    "modelService",
     ["$rootScope",
      function($rootScope) {
          var service = {
+             model: [],
              saveState: function () {
-                 localStorage[storageKey] = JSON.stringify(model);
+                 console.log("Saving model: " + JSON.stringify(service.model));
+                 localStorage[storageKey] = angular.toJson(service.model);
              },
              loadState: function () {
-                 model = JSON.parse(localStorage[storageKey]);
+                 storedData = localStorage[storageKey];
+                 if (storedData) {
+                     service.model = JSON.parse(storedData);
+                     console.log("Loaded data: " + storedData);
+                 } else {
+                     console.log("No stored data to load");
+                 }
              }
          }
-
-         // Hook up the service to global event handlers.
-         $rootScope.$on("stateChanged", service.saveState);
-         $rootScope.$on("loadState", service.loadState);
 
          return service;
      }]);
@@ -39,8 +33,8 @@ compostControllers.factory(
 /*
   Controller for the food list view.
 */
-compostControllers.controller("FoodListCtrl", function ($rootScope, $scope) {
-    $scope.foods = model;
+compostControllers.controller("FoodListCtrl", function ($scope, modelService) {
+    $scope.foods = modelService.model;
 
     $scope.selectedItem = -1;
 
@@ -57,7 +51,7 @@ compostControllers.controller("FoodListCtrl", function ($rootScope, $scope) {
     $scope.itemRemoved = function ($index) {
         $scope.foods.splice($index, 1);
         $scope.selectedItem = -1;
-        $rootScope.$broadcast("stateChanged");
+        modelService.saveState();
     };
 
     $scope.getAge = function (food) {
@@ -80,7 +74,7 @@ compostControllers.controller("FoodListCtrl", function ($rootScope, $scope) {
 /*
   Controller for the add view.
 */
-compostControllers.controller("AddFoodCtrl", function ($rootScope, $scope, $location) {
+compostControllers.controller("AddFoodCtrl", function ($scope, $location, modelService) {
     $scope.now = new Date();
     $scope.daysToExpiry = 0;
     $scope.food = {
@@ -90,8 +84,8 @@ compostControllers.controller("AddFoodCtrl", function ($rootScope, $scope, $loca
 
     // When the "Save" button is clicked, add the food to our list.
     $scope.save = function () {
-        model.push($scope.food);
-        $rootScope.$broadcast("stateChanged");
+        modelService.model.push($scope.food);
+        modelService.saveState();
         $location.path("/foods");
     };
 
