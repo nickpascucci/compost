@@ -55,16 +55,18 @@ compostControllers.controller("FoodListCtrl", function ($scope, modelService) {
     };
 
     $scope.getAge = function (food) {
-        return getDaysUntil(dateFromIsoString(food.created), new Date());
+        return getDaysUntil(momentFromIsoString(food.created), moment().startOf("day"));
     }
 
     $scope.getDaysToExpiry = function (food) {
-        return getDaysUntil(new Date(), dateFromIsoString(food.expiresOn));
+        return getDaysUntil(moment().startOf("day"), momentFromIsoString(food.expiresOn));
     }
 
     $scope.getExpirationDate = function (food) {
         if ($scope.getDaysToExpiry(food) == 0) {
             return "today";
+        } else if ($scope.getDaysToExpiry(food) == 1) {
+            return "tomorrow";
         } else {
             return "on " + food.expiresOn;
         }
@@ -75,12 +77,12 @@ compostControllers.controller("FoodListCtrl", function ($scope, modelService) {
   Controller for the add view.
 */
 compostControllers.controller("AddFoodCtrl", function ($scope, $location, modelService) {
-    $scope.now = new Date();
+    $scope.now = moment().startOf("day");
     $scope.daysToExpiry = 0;
     $scope.food = {
         "name": "New Food",
-        "created": dateToIsoString(new Date()),
-        "expiresOn": dateToIsoString(new Date())
+        "created": momentToIsoString(moment().startOf("day")),
+        "expiresOn": momentToIsoString(moment().startOf("day"))
     };
 
     // When the "Save" button is clicked, add the food to our list.
@@ -95,22 +97,20 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, modelS
     };
 
     $scope.onDateChanged = function () {
-        $scope.daysToExpiry = getDaysUntil($scope.now, dateFromIsoString($scope.food.expiresOn));
+        $scope.daysToExpiry = getDaysUntil($scope.now, momentFromIsoString($scope.food.expiresOn));
     }
 });
 
-function dateToIsoString(d) {
-    return d.toISOString().split("T")[0];
+function momentToIsoString(m) {
+    return m.format("YYYY-MM-DD");
 }
 
-function dateFromIsoString(s) {
-    // parse a date in yyyy-mm-dd format
-    var parts = s.split('-');
-    // new Date(year, month [, day [, hours[, minutes[, seconds[, ms]]]]])
-    return new Date(parts[0], parts[1]-1, parts[2]); // Note: months are 0-based
+function momentFromIsoString(s) {
+    return moment(s);
 }
 
+// TODO Calculate based on calendar days, not milliseconds.
 var millisPerDay = (24 * 60 * 60 * 1000);
 function getDaysUntil(begin, end) {
-    return Math.round((end.getTime() - begin.getTime()) / millisPerDay);
+    return end.diff(begin, "days");
 }
