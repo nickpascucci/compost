@@ -1,4 +1,4 @@
-var compostControllers = angular.module("compostControllers", []);
+var compostControllers = angular.module("compostControllers", ["firebase"]);
 
 var storageKey = "ModelData";
 
@@ -28,6 +28,39 @@ compostControllers.factory(
          return service;
      }]);
 
+compostControllers.factory("authService", function($location, $firebaseSimpleLogin) {
+    ref = new Firebase("https://compost.firebaseio.com");
+    var service = {
+        dataRef: ref,
+        loginObj: $firebaseSimpleLogin(ref),
+        logIn: function () {
+            service.loginObj.$login("google").then(function(user) {
+                service.user = user;
+                console.log("Logged in as ", user.displayName);
+                $location.path("/foods");
+            }, function(error) {
+                console.error('Login failed: ', error);
+            });
+        },
+        tryAutoLogin: function() {
+            service.loginObj.$getCurrentUser().then(function (user) {
+                service.user = user;
+                $location.path("/foods");
+            });
+        },
+        getUser: function() {
+            return service.user;
+        }
+    };
+
+    return service;
+});
+
+compostControllers.controller("AuthCtrl", function($scope, authService) {
+    $scope.logIn = function () {
+        authService.logIn();
+    }
+});
 
 /*
   Controller for the food list view.

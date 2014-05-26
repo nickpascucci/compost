@@ -3,31 +3,32 @@ var compostApp = angular.module("compostApp", [
     "compostControllers"
 ]);
 
-var stateLoaded = false;
-
 compostApp.config([
     "$routeProvider",
     function($routeProvider) {
         $routeProvider
             .when("/foods", {
-                templateUrl: "partials/food-list.html",
+                templateUrl: "partials/foods.html",
                 controller: "FoodListCtrl"
+            }).when("/login", {
+                templateUrl: "partials/login.html",
+                controller: "AuthCtrl"
             }).when("/add", {
-                templateUrl: "partials/add-form.html",
+                templateUrl: "partials/add.html",
                 controller: "AddFoodCtrl"
             }).otherwise({
-                redirectTo: "/foods"
+                redirectTo: "/login"
             });
     }])
-    .run(function($rootScope, modelService) {
+    .run(function($rootScope, $location, modelService, authService) {
         // When the route changes, load data from persistent storage.
         $rootScope.$on("$routeChangeStart", function (event, next, current) {
-            if (!stateLoaded) {
-                console.log("Session state not loaded, checking local storage.");
-                modelService.loadState();
-                stateLoaded = true;
+            // if (!stateLoaded) {
+            if(!authService.getUser()) {
+                $location.path("/login");
+                authService.tryAutoLogin();
             } else {
-                console.log("Session state already loaded");
+                console.log("Already logged in");
             }
         });
 
