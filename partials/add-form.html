@@ -4,13 +4,14 @@
     <div class="expiration">
       Expires in
       <div class="expire-1">
-        {{getDaysBetween(food.date, now)}}
+        {{daysToExpiry}}
       </div>
       days
     </div>
   </div>
   <div class="right half left-border">
-    <input class="expiration-date" type="date" ng-model="food.date"/>
+    <input class="expiration-date" type="date" ng-model="food.expiresOn"
+           ng-change="onDateChanged()"/>
     <div class="save-button" ng-click="save()">Save</div>
   </div>
 </div>

@@ -59,6 +59,22 @@ compostControllers.controller("FoodListCtrl", function ($rootScope, $scope) {
         $scope.selectedItem = -1;
         $rootScope.$broadcast("stateChanged");
     };
+
+    $scope.getAge = function (food) {
+        return getDaysUntil(dateFromIsoString(food.created), new Date());
+    }
+
+    $scope.getDaysToExpiry = function (food) {
+        return getDaysUntil(new Date(), dateFromIsoString(food.expiresOn));
+    }
+
+    $scope.getExpirationDate = function (food) {
+        if ($scope.getDaysToExpiry(food) == 0) {
+            return "today";
+        } else {
+            return "on " + food.expiresOn;
+        }
+    }
 });
 
 /*
@@ -66,17 +82,22 @@ compostControllers.controller("FoodListCtrl", function ($rootScope, $scope) {
 */
 compostControllers.controller("AddFoodCtrl", function ($rootScope, $scope, $location) {
     $scope.now = new Date();
-    $scope.food = {};
-    $scope.food.date = dateToIsoString(new Date());
+    $scope.daysToExpiry = 0;
+    $scope.food = {
+        "created": dateToIsoString(new Date()),
+        "expiresOn": dateToIsoString(new Date())
+    };
+
     // When the "Save" button is clicked, add the food to our list.
     $scope.save = function () {
-        model.push({"name": $scope.food.name,
-                    "age": 0,
-                    "expiresIn": getDaysUntil($scope.now, dateFromIsoString($scope.food.date))});
-        console.log("Date: " + $scope.food.date);
+        model.push($scope.food);
         $rootScope.$broadcast("stateChanged");
         $location.path("/foods");
     };
+
+    $scope.onDateChanged = function () {
+        $scope.daysToExpiry = getDaysUntil($scope.now, dateFromIsoString($scope.food.expiresOn));
+    }
 });
 
 function dateToIsoString(d) {
@@ -92,7 +113,5 @@ function dateFromIsoString(s) {
 
 var millisPerDay = (24 * 60 * 60 * 1000);
 function getDaysUntil(begin, end) {
-    var days = Math.round(Math.abs((end.getTime() - begin.getTime())) / millisPerDay);
-    console.log("Days between " + begin + " " + end + ": " + days);
-    return days;
+    return Math.round((end.getTime() - begin.getTime()) / millisPerDay);
 }

@@ -4,13 +4,13 @@
        ng-click="itemClicked($index)">
     <div class="card-front">
       <div class="left one-third status">
-        <h1 class="expire-3">{{food.expiresIn}}</h1>
+        <h1 class="expire-3">{{getDaysToExpiry(food)}}</h1>
         Days
       </div>
       <div class="right two-thirds description">
         <h1>{{food.name}}</h1>
-        <p>Expires today</p>
-        <p>Added {{food.age}} days ago</p>
+        <p>Expires {{getExpirationDate(food)}}</p>
+        <p>Added {{getAge(food)}} days ago</p>
       </div>
     </div>
     <div class="card-back">
@@ -24,15 +24,5 @@
       </div>
     </div>
   </a>
-  <!-- <div class="card"> -->
-  <!--   <div class="status"> -->
-  <!--     <h1 class="expire-1">1</h1> -->
-  <!--     Week -->
-  <!--   </div> -->
-  <!--   <div class="body-text"> -->
-  <!--     <h1>Italian Sausage</h1> -->
-  <!--     <p>Expiring on May 27th</p> -->
-  <!--     <p>Added today</p> -->
-  <!--   </div> -->
 </div>
 </div>
