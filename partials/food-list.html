@@ -1,0 +1,38 @@
+<div class="content float-left" ng-controller="FoodListCtrl">
+  <div ng-class="{'card': true, 'show-back': selectedItem == $index}"
+       ng-repeat="food in foods"
+       ng-click="itemClicked($index)">
+    <div class="card-front">
+      <div class="left one-third status">
+        <h1 class="expire-3">{{food.expiresIn}}</h1>
+        Days
+      </div>
+      <div class="right two-thirds description">
+        <h1>{{food.name}}</h1>
+        <p>Expires today</p>
+        <p>Added {{food.age}} days ago</p>
+      </div>
+    </div>
+    <div class="card-back">
+      <div class="cancel">Cancel</div>
+      <div class="remove" ng-click="itemRemoved($index)">Remove</div>
+    </div>
+  </div>
+  <a href="#/add">
+    <div class="primary-action">
+      <div class="create">
+      </div>
+    </div>
+  </a>
+  <!-- <div class="card"> -->
+  <!--   <div class="status"> -->
+  <!--     <h1 class="expire-1">1</h1> -->
+  <!--     Week -->
+  <!--   </div> -->
+  <!--   <div class="body-text"> -->
+  <!--     <h1>Italian Sausage</h1> -->
+  <!--     <p>Expiring on May 27th</p> -->
+  <!--     <p>Added today</p> -->
+  <!--   </div> -->
+</div>
+</div>

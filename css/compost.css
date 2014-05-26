@@ -1,0 +1,198 @@
+body {
+    font-family: Raleway, Arial, Helvetica, sans-serif;
+    color: #E0E0E0;
+    min-height: 100%;
+}
+
+input {
+    border: none;
+    background: black;
+    color: white;
+    font-size: .75em;
+}
+
+.food-name {
+    width: 100%;
+    text-align: center;
+}
+
+.expiration-date {
+    font-size: 1.5em;
+}
+
+.content {
+    overflow: scroll;
+}
+
+.highlight {
+    color: rgba(128, 195, 93, 1);
+}
+
+.expire-1 {
+    color: rgba(8, 199, 0, 1);
+}
+
+.expire-2 {
+    color: rgba(206, 191, 27, 1);
+}
+
+.expire-3 {
+    color: rgba(211, 29, 29, 1);
+}
+
+.float-left .card {
+    float: left;
+    width: 500px;
+    height: 270px;
+}
+
+/*
+  When the front or back is shown, it should take up its parent's size.
+  */
+.card-front, .card-back {
+    width: inherit;
+    height: inherit;
+}
+
+/*
+  Adding show-front or show-back classes hides the other side.
+  */
+.show-front .card-back {
+    display: none;
+}
+
+.show-back .card-front {
+    display: none;
+}
+
+.one-third {
+    width: 33%;
+}
+
+.two-thirds {
+    width: 66%;
+}
+
+.half {
+    width: 49%;
+}
+
+.left {
+    font-size: 3em;
+    text-align: center;
+    float: left;
+    position: relative;
+    height: 100%;
+    padding: 20px 0px;
+}
+
+.right{
+    text-align: center;
+    float: right;
+    position: relative;
+    height: 100%;
+}
+
+.left-border {
+    border-left: 1px white;
+    border-left-style: solid;
+}
+
+.status {
+
+}
+
+.description {
+    background: #EEE;
+    color: black;
+}
+
+.expiration {
+    margin-top: 40px;
+}
+
+.cancel {
+    font-size: 1em;
+    text-align: center;
+    width: 33%;
+    float: left;
+    position: relative;
+    height: 230px;
+    padding: 20px 0px;
+}
+
+.remove {
+    text-align: center;
+    float: right;
+    width: 66%;
+    position: relative;
+    background: green;
+    height: 100%;
+}
+
+.save-button {
+    background: green;
+    width: 100%;
+    height: 40px;
+    padding-top: 15px;
+    position: absolute;
+    bottom: 0px;
+    font-size: 20px;
+}
+
+.multi-column {
+    columns: 300px 3;
+    -webkit-columns: 300px 3;
+}
+
+.card {
+    background: #111;
+    border: 1px solid #AAA;
+    padding: 0px;
+    margin: 15px;
+    overflow: hidden;
+}
+
+.card h1 {
+    margin: 0px;
+    padding: 10px;
+    padding-bottom: 0px;
+}
+
+.card p {
+    margin: 0px;
+    padding: 10px;
+}
+
+.primary-action {
+    background: rgba(255, 0, 0, .65);
+    padding: 0px;
+    margin: 15px;
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+.create {
+    background-image: url("../img/circle_plus.png");
+    height: inherit;
+    width: inherit;
+    background-repeat: no-repeat;
+    position: absolute;
+    left: 11.5px;
+    top: 11.5px;
+}
+
+.add-form {
+    width: 500px;
+    height: 350px;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    margin-left: -250px;
+    margin-top: -175px;
+    background: black;
+}
