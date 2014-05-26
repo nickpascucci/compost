@@ -211,8 +211,7 @@ input {
     height: 350px;
     position: absolute;
     left: 50%;
-    top: 50%;
+    top: 20%;
     margin-left: -250px;
-    margin-top: -175px;
     background: black;
 }
