@@ -85,7 +85,7 @@ input {
     height: 100%;
 }
 
-.right{
+.right {
     text-align: center;
     float: right;
     position: relative;
@@ -109,6 +109,7 @@ input {
     }
     
     .add-form {
+        text-align: center;
         width: 500px;
         height: 350px;
         position: absolute;
@@ -121,7 +122,6 @@ input {
     
     .save-button {
         background: green;
-        width: 90%;
         height: 40px;
         padding-top: 15px;
         position: absolute;
@@ -133,7 +133,6 @@ input {
 
     .cancel-button {
         background: red;
-        width: 90%;
         height: 40px;
         padding-top: 15px;
         position: absolute;
@@ -154,28 +153,29 @@ input {
     }
 
     .add-form {
+        text-align: center;
         height: 350px;
         position: absolute;
         top: 20%;
         background: black;
     }
     
-    .add-form .left {
-        float: none;
-    }
-
-    .add-form .right {
-        float: none;
+    .form-left {
+        float: left;
         position: static;
+        text-align: center;
+        height: 100%;
     }
     
-    .add-form .half {
-        width: 100%;
+    .form-right {
+        float: right;
+        position: static;
+        text-align: center;
+        height: 100%;
     }
     
     .save-button {
         background: green;
-        width: 49%;
         height: 40px;
         padding-top: 15px;
         position: absolute;
@@ -186,7 +186,6 @@ input {
 
     .cancel-button {
         background: red;
-        width: 49%;
         height: 40px;
         padding-top: 15px;
         position: absolute;
@@ -210,6 +209,13 @@ input {
 .expiration {
     font-size: 3em;
     margin-top: 10px;
+}
+
+.expiration-time {
+    text-align: center;
+    font-size: 1.2em;
+    width: 40%;
+    color: inherit;
 }
 
 .cancel {
@@ -249,7 +255,6 @@ input {
 
 .card h1 {
     margin: 3px;
-    padding-bottom: 0px;
 }
 
 .card p {

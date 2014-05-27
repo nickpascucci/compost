@@ -100,7 +100,6 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, $fireb
         "id": moment().unix(),
         "name": "New Food",
         "created": momentToIsoString(moment().startOf("day")),
-        "expiresOn": momentToIsoString(moment().startOf("day"))
     };
 
     // When the "Save" button is clicked, add the food to our list.
@@ -108,6 +107,7 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, $fireb
         peopleRef = new Firebase("https://compost.firebaseio.com/people");
         userRef = peopleRef.child(authService.getUser().id);
         itemRef = userRef.child($scope.food.id);
+        $scope.food["expiresOn"] = momentToIsoString($scope.now.add('days', $scope.daysToExpiry));
         $firebase(itemRef).$set($scope.food);
 
         $location.path("/foods");

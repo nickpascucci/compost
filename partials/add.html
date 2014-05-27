@@ -1,20 +1,18 @@
 <div class="add-form" ng-controller="AddFoodCtrl">
-  <div class="left half">
-    <input class="food-name" type="text" placeholder="Name" ng-model="food.name" autofocus/>
-    <div class="expiration">
-      Expires in
-      <div ng-class="{'expire-3': daysToExpiry < 1,
-                   'expire-2': daysToExpiry < 3,
+  <input class="food-name" type="text" placeholder="Name" ng-model="food.name" autofocus/>
+  <div class="expiration">
+    Expires in
+    <div ng-class="{'expire-3': daysToExpiry <= 1,
+                   'expire-2': daysToExpiry > 1 && daysToExpiry < 3,
                    'expire-1': daysToExpiry >= 3}">
-        {{daysToExpiry}}
-      </div>
-      days
+      <input class="expiration-time" type="number" name="" value="" step="1" ng-model="daysToExpiry"/>
     </div>
-    <div class="cancel-button" ng-click="cancel()">Cancel</div>
+    days
   </div>
-  <div class="right half">
-    <input class="expiration-date" type="date" ng-model="food.expiresOn"
-           ng-change="onDateChanged()"/>
-    <div class="save-button" ng-click="save()">Save</div>
+  <div class="form-left">
+    <div class="cancel-button half" ng-click="cancel()">Cancel</div>
+  </div>
+  <div class="form-right">
+    <div class="save-button half" ng-click="save()">Save</div>
   </div>
 </div>
