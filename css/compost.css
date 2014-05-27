@@ -1,7 +1,8 @@
 body {
     font-family: "Open Sans", Arial, Helvetica, sans-serif;
     color: #E0E0E0;
-    min-height: 100%;
+    background: #252424;
+    margin: 0px;
 }
 
 input {
@@ -15,6 +16,7 @@ input {
     width: 100%;
     font-size: 3em;
     text-align: center;
+    margin-top: 10px;
 }
 
 .expiration-date {
@@ -22,7 +24,7 @@ input {
 }
 
 .content {
-    overflow: scroll;
+
 }
 
 .highlight {
@@ -44,23 +46,18 @@ input {
     font-weight: 300;
 }
 
-.float-left .card {
+.float-left {
     float: left;
-    width: 500px;
-    height: 270px;
 }
 
-/*
-  When the front or back is shown, it should take up its parent's size.
-  */
+/**
+ * Adding show-front or show-back classes hides the other side.
+ */
 .card-front, .card-back {
     width: inherit;
     height: inherit;
 }
 
-/*
-  Adding show-front or show-back classes hides the other side.
-  */
 .show-front .card-back {
     display: none;
 }
@@ -100,12 +97,112 @@ input {
     border-left-style: solid;
 }
 
+@media all and (min-width: 540px) {
+    .card {
+        background: #111;
+        padding: 0px;
+        margin: 15px;
+        width: 500px;
+        height: 270px;
+        overflow: hidden;
+        border-radius: 10px;
+    }
+    
+    .add-form {
+        width: 500px;
+        height: 350px;
+        position: absolute;
+        left: 50%;
+        top: 20%;
+        margin-left: -250px;
+        background: black;
+        border-radius: 10px;
+    }
+    
+    .save-button {
+        background: green;
+        width: 90%;
+        height: 40px;
+        padding-top: 15px;
+        position: absolute;
+        bottom: 0px;
+        font-size: 20px;
+        right: 0px;
+        border-radius: 0px 0px 10px 0px;
+    }
+
+    .cancel-button {
+        background: red;
+        width: 90%;
+        height: 40px;
+        padding-top: 15px;
+        position: absolute;
+        bottom: 0px;
+        font-size: 20px;
+        left: 0px;
+        border-radius: 0px 0px 0px 10px;
+    }
+}
+
+@media all and (max-width: 540px) {
+    .card {
+        background: #111;
+        margin: 15px 0px;
+        width: 100%;
+        height: 270px;
+        overflow: hidden;
+    }
+
+    .add-form {
+        height: 350px;
+        position: absolute;
+        top: 20%;
+        background: black;
+    }
+    
+    .add-form .left {
+        float: none;
+    }
+
+    .add-form .right {
+        float: none;
+        position: static;
+    }
+    
+    .add-form .half {
+        width: 100%;
+    }
+    
+    .save-button {
+        background: green;
+        width: 49%;
+        height: 40px;
+        padding-top: 15px;
+        position: absolute;
+        bottom: 0px;
+        font-size: 20px;
+        right: 0px;
+    }
+
+    .cancel-button {
+        background: red;
+        width: 49%;
+        height: 40px;
+        padding-top: 15px;
+        position: absolute;
+        bottom: 0px;
+        font-size: 20px;
+        left: 0px;
+    }
+
+}
+
 .status {
     font-size: 3em;
 }
 
 .description {
-    background: #EEE;
+    background: #E0E0E0;
     color: black;
     padding-top: 20px;
 }
@@ -116,7 +213,7 @@ input {
 }
 
 .cancel {
-    font-size: 2.5em;
+    font-size: 2.0em;
     text-align: center;
     height: 40px;
     position: relative;
@@ -131,6 +228,14 @@ input {
     position: absolute;
 }
 
+.remove-button {
+    font-size: 2.0em;
+    text-align: center;
+    position: relative;
+    margin-top: -30px;
+    top: 50%;
+}
+
 .login-button {
     font-size: 2em;
     width: 200px;
@@ -138,53 +243,12 @@ input {
     left: 50%;
     top: 30%;
     margin-left: -100px;
-}
-
-.remove-button {
-    font-size: 2.5em;
-    text-align: center;
-    position: relative;
-    margin-top: -30px;
-    top: 50%;
-}
-
-.save-button {
-    background: green;
-    width: 90%;
-    height: 40px;
-    padding-top: 15px;
-    position: absolute;
-    bottom: 0px;
-    font-size: 20px;
-    right: 0px;
-}
-
-.cancel-button {
-    background: red;
-    width: 90%;
-    height: 40px;
-    padding-top: 15px;
-    position: absolute;
-    bottom: 0px;
-    font-size: 20px;
-    left: 0px;
-}
-
-.multi-column {
-    columns: 300px 3;
-    -webkit-columns: 300px 3;
-}
-
-.card {
-    background: #111;
-    border: 1px solid #AAA;
-    padding: 0px;
-    margin: 15px;
-    overflow: hidden;
+    border-radius: 10px;
+    padding: 10px;
 }
 
 .card h1 {
-    margin: 0px;
+    margin: 3px;
     padding-bottom: 0px;
 }
 
@@ -194,15 +258,16 @@ input {
 }
 
 .primary-action {
-    background: rgba(255, 0, 0, .65);
+    background: rgba(8, 199, 0, 1);
     padding: 0px;
-    margin: 15px;
     position: fixed;
     bottom: 20px;
     right: 20px;
-    width: 50px;
-    height: 50px;
+    width: 80px;
+    height: 80px;
     border-radius: 50%;
+    border-style: solid;
+    border-color: rgba(0, 0, 0, 0.3);
 }
 
 .create {
@@ -213,14 +278,4 @@ input {
     position: absolute;
     left: 11.5px;
     top: 11.5px;
-}
-
-.add-form {
-    width: 500px;
-    height: 350px;
-    position: absolute;
-    left: 50%;
-    top: 20%;
-    margin-left: -250px;
-    background: black;
 }
