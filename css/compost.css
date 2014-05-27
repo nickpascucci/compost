@@ -206,7 +206,7 @@ input {
 }
 
 .create {
-    background-image: url("../img/circle_plus.png");
+    /* background-image: url("../img/circle_plus.png"); */
     height: inherit;
     width: inherit;
     background-repeat: no-repeat;
