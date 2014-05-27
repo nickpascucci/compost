@@ -20,10 +20,9 @@ compostApp.config([
                 redirectTo: "/login"
             });
     }])
-    .run(function($rootScope, $location, modelService, authService) {
+    .run(function($rootScope, $location, authService) {
         // When the route changes, load data from persistent storage.
         $rootScope.$on("$routeChangeStart", function (event, next, current) {
-            // if (!stateLoaded) {
             if(!authService.getUser()) {
                 $location.path("/login");
                 authService.tryAutoLogin();
@@ -31,10 +30,4 @@ compostApp.config([
                 console.log("Already logged in");
             }
         });
-
-        // When the window is unloaded, persist state.
-        // The state should be persisted on each change, but it doesn't hurt to do it here too.
-        window.onbeforeunload = function (event) {
-            modelService.saveState();
-        };
     });

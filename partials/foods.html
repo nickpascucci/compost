@@ -1,6 +1,6 @@
 <div class="content float-left" ng-controller="FoodListCtrl">
   <div ng-class="{'card': true, 'show-back': selectedItem == food.id}"
-       ng-repeat="food in foods | orderBy : getDaysToExpiry"
+       ng-repeat="food in foods | orderByPriority | orderBy : getDaysToExpiry"
        ng-click="itemClicked(food)">
     <div class="card-front">
       <div class="left one-third status">
