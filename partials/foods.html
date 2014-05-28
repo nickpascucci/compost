@@ -1,4 +1,4 @@
-<div class="content float-left" ng-controller="FoodListCtrl">
+<div class="" ng-controller="FoodListCtrl">
   <div ng-class="{'card': true, 'show-back': selectedItem == food.id, 'show-front': selectedItem != food.id}"
        ng-repeat="food in foods | orderByPriority | orderBy : getDaysToExpiry"
        ng-click="itemClicked(food)">
@@ -31,6 +31,7 @@
   <a href="#/add">
     <div class="primary-action">
       <div class="create">
+        New
       </div>
     </div>
   </a>
