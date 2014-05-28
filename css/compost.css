@@ -126,6 +126,28 @@ input {
         border-style: solid;
     }
 
+    .cancel {
+        font-size: 2.0em;
+        position: absolute;
+        margin-top: -30px;
+        top: 50%;
+        left: 40px;
+    }
+
+    .remove {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+    }
+
+    .remove-button {
+        font-size: 2.0em;
+        position: absolute;
+        margin-top: -30px;
+        top: 50%;
+        right: 40px;
+    }
+
     .save-button {
         height: 40px;
         padding-top: 15px;
@@ -177,6 +199,28 @@ input {
         height: 100%;
     }
 
+    .cancel {
+        font-size: 2.0em;
+        position: absolute;
+        margin-top: -30px;
+        top: 50%;
+        left: 20px;
+    }
+
+    .remove {
+        height: 100%;
+        width: 100%;
+        position: absolute;
+    }
+
+    .remove-button {
+        font-size: 2.0em;
+        position: absolute;
+        margin-top: -30px;
+        top: 50%;
+        right: 20px;
+    }
+
     .save-button {
         height: 40px;
         padding-top: 15px;
@@ -221,28 +265,6 @@ input {
     font-size: 1.2em;
     width: 40%;
     color: inherit;
-}
-
-.cancel {
-    font-size: 2.0em;
-    position: absolute;
-    margin-top: -30px;
-    top: 50%;
-    left: 40px;
-}
-
-.remove {
-    height: 100%;
-    width: 100%;
-    position: absolute;
-}
-
-.remove-button {
-    font-size: 2.0em;
-    position: absolute;
-    margin-top: -30px;
-    top: 50%;
-    right: 40px;
 }
 
 .login-button {
