@@ -1,19 +1,19 @@
 body {
     font-family: "Open Sans", Arial, Helvetica, sans-serif;
-    color: #E0E0E0;
-    background: #252424;
+    color: #414141;
+    background: #F7F7F7;
     margin: 0px;
 }
 
 input {
     border: none;
-    background: black;
-    color: white;
+    background: #F7F7F7;
+    color: inherit;
     font-size: .75em;
 }
 
 .food-name {
-    width: 100%;
+    width: 90%;
     font-size: 3em;
     text-align: center;
     margin-top: 10px;
@@ -103,15 +103,16 @@ input {
 
 @media all and (min-width: 520px) {
     .card {
-        background: #111;
         padding: 0px;
         margin: 15px;
         width: 500px;
         height: 270px;
         overflow: hidden;
         border-radius: 10px;
+        border: 1px black;
+        border-style: solid;
     }
-    
+
     .add-form {
         text-align: center;
         width: 500px;
@@ -120,36 +121,38 @@ input {
         left: 50%;
         top: 20%;
         margin-left: -250px;
-        background: black;
         border-radius: 10px;
+        border: 1px black;
+        border-style: solid;
     }
-    
+
     .save-button {
-        background: green;
         height: 40px;
         padding-top: 15px;
         position: absolute;
         bottom: 0px;
         font-size: 20px;
         right: 0px;
-        border-radius: 0px 0px 10px 0px;
+        border-radius: 10px;
+        border: 1px green;
+        border-style: solid;
     }
 
     .cancel-button {
-        background: red;
         height: 40px;
         padding-top: 15px;
         position: absolute;
         bottom: 0px;
         font-size: 20px;
         left: 0px;
-        border-radius: 0px 0px 0px 10px;
+        border-radius: 10px;
+        border: 1px red;
+        border-style: solid;
     }
 }
 
 @media all and (max-width: 520px) {
     .card {
-        background: #111;
         margin: 15px 0px;
         width: 100%;
         height: 270px;
@@ -160,39 +163,42 @@ input {
         text-align: center;
         height: 100%;
         position: absolute;
-        background: black;
     }
-    
+
     .form-left {
         float: left;
         text-align: center;
         height: 100%;
     }
-    
+
     .form-right {
         float: right;
         text-align: center;
         height: 100%;
     }
-    
+
     .save-button {
-        background: rgba(2, 150, 2, 0.95);
         height: 40px;
         padding-top: 15px;
         position: absolute;
         bottom: 0px;
         font-size: 20px;
         right: 0px;
+        border-radius: 10px;
+        border: 1px green;
+        border-style: solid;
     }
 
     .cancel-button {
-        background: rgba(179, 2, 2, 0.95);
         height: 40px;
         padding-top: 15px;
         position: absolute;
         bottom: 0px;
         font-size: 20px;
         left: 0px;
+        border-radius: 10px;
+        border: 1px red;
+        border-style: solid;
     }
 
 }
@@ -202,9 +208,7 @@ input {
 }
 
 .description {
-    background: #E0E0E0;
-    color: black;
-    padding-top: 20px;
+    padding-top: 70px;
 }
 
 .expiration {
@@ -221,15 +225,13 @@ input {
 
 .cancel {
     font-size: 2.0em;
-    text-align: center;
-    height: 40px;
-    position: relative;
+    position: absolute;
     margin-top: -30px;
     top: 50%;
+    left: 40px;
 }
 
 .remove {
-    background: green;
     height: 100%;
     width: 100%;
     position: absolute;
@@ -237,10 +239,10 @@ input {
 
 .remove-button {
     font-size: 2.0em;
-    text-align: center;
-    position: relative;
+    position: absolute;
     margin-top: -30px;
     top: 50%;
+    right: 40px;
 }
 
 .login-button {
