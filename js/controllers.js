@@ -19,8 +19,8 @@ compostControllers.factory("authService", function($location, $firebaseSimpleLog
         tryAutoLogin: function() {
             service.loginObj.$getCurrentUser().then(function (user) {
                 service.user = user;
-                if (user) {
-                    $location.path("/foods");
+                if (!user) {
+                    $location.path("/login");
                 }
             });
         },
@@ -96,10 +96,12 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, $fireb
     authService.checkLogIn();
     $scope.now = moment().startOf("day");
     $scope.daysToExpiry = 0;
+    $scope.showDays = true;
     $scope.food = {
         "id": moment().unix(),
         "name": "New Food",
         "created": momentToIsoString(moment().startOf("day")),
+        "expiresOn": momentToIsoString($scope.now.add("days", $scope.daysToExpiry)),
     };
 
     // When the "Save" button is clicked, add the food to our list.
@@ -107,7 +109,6 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, $fireb
         peopleRef = new Firebase("https://compost.firebaseio.com/people");
         userRef = peopleRef.child(authService.getUser().id);
         itemRef = userRef.child($scope.food.id);
-        $scope.food["expiresOn"] = momentToIsoString($scope.now.add('days', $scope.daysToExpiry));
         $firebase(itemRef).$set($scope.food);
 
         $location.path("/foods");
@@ -117,8 +118,16 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, $fireb
         $location.path("/foods");
     };
 
+    $scope.onDaysToExpiryChanged = function () {
+        $scope.food["expiresOn"] = momentToIsoString($scope.now.add('days', $scope.daysToExpiry));
+    }
+
     $scope.onDateChanged = function () {
         $scope.daysToExpiry = getDaysUntil($scope.now, momentFromIsoString($scope.food.expiresOn));
+    }
+
+    $scope.toggleDateFormat = function () {
+        $scope.showDays = !$scope.showDays;
     }
 });
 

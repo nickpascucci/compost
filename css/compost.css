@@ -268,6 +268,13 @@ input {
     color: inherit;
 }
 
+.date-picker {
+    text-align: center;
+    font-size: 1.2em;
+    color: inherit;
+    width: 90%;
+}
+
 .login-button {
     font-size: 2em;
     width: 200px;
@@ -277,6 +284,20 @@ input {
     margin-left: -100px;
     border-radius: 10px;
     padding: 10px;
+}
+
+.show-date .days-left {
+    display: none;
+}
+
+.show-days-left .date-input {
+    display: none;
+}
+
+.date-toggle {
+    position: absolute;
+    bottom: 75px;
+    right: 20px;
 }
 
 .card h1 {
@@ -307,4 +328,13 @@ input {
     background-repeat: no-repeat;
     position: absolute;
     top: 15px;
+}
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button,
+input::-webkit-calendar-picker-indicator,
+input::-webkit-clear-button {
+  -webkit-appearance: none;
+  margin: 0;
+  display: none;
 }

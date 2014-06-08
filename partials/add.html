@@ -1,13 +1,24 @@
 <div class="add-form" ng-controller="AddFoodCtrl">
   <input class="food-name" type="text" placeholder="Name" ng-model="food.name" autofocus/>
-  <div class="expiration">
-    Expires in
-    <div ng-class="{'expire-3': daysToExpiry <= 1,
-                   'expire-2': daysToExpiry > 1 && daysToExpiry < 3,
-                   'expire-1': daysToExpiry >= 3}">
-      <input class="expiration-time" type="tel" name="" value="" step="1" ng-model="daysToExpiry"/>
+  <div ng-class="{'expiration': true, 'show-days-left': showDays, 'show-date': !showDays}">
+    <div class="days-left">
+      Expires in
+      <div ng-class="{'expire-3': daysToExpiry <= 1,
+                     'expire-2': daysToExpiry > 1 && daysToExpiry < 3,
+                     'expire-1': daysToExpiry >= 3}">
+        <input class="expiration-time" type="tel" step="1" ng-change="onDaysToExpiryChanged()" ng-model="daysToExpiry"/>
+      </div>
+      days
     </div>
-    days
+    <div class="date-input">
+      Expires on
+      <div ng-class="{'expire-3': daysToExpiry <= 1,
+                     'expire-2': daysToExpiry > 1 && daysToExpiry < 3,
+                     'expire-1': daysToExpiry >= 3}">
+        <input class="date-picker" type="date" ng-change="onDateChanged()" ng-model="food.expiresOn"/>
+      </div>
+    </div>
+    <input class="date-toggle" ng-click="toggleDateFormat()" type="image" src="img/calendar.png" alt="Switch Date Format"/>
   </div>
   <div class="form-left">
     <div class="cancel-button half" ng-click="cancel()">Cancel</div>
