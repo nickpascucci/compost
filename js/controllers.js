@@ -101,7 +101,7 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, $fireb
         "id": moment().unix(),
         "name": "New Food",
         "created": momentToIsoString(moment().startOf("day")),
-        "expiresOn": momentToIsoString($scope.now.add("days", $scope.daysToExpiry)),
+        "expiresOn": momentToIsoString($scope.now.clone().add("days", $scope.daysToExpiry)),
     };
 
     // When the "Save" button is clicked, add the food to our list.
@@ -119,7 +119,8 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, $fireb
     };
 
     $scope.onDaysToExpiryChanged = function () {
-        $scope.food["expiresOn"] = momentToIsoString($scope.now.add('days', $scope.daysToExpiry));
+        $scope.food["expiresOn"] = momentToIsoString(
+            $scope.now.clone().add('days', $scope.daysToExpiry));
     }
 
     $scope.onDateChanged = function () {
