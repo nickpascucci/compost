@@ -1,6 +1,7 @@
 var compostApp = angular.module("compostApp", [
     "ngRoute",
-    "compostControllers"
+    "compostControllers",
+    "compostServices"
 ]);
 
 compostApp.config([

@@ -1,7 +1,8 @@
 compost
 =======
 
-A simple web app to track your fridge.
+Food goes bad - I get it. I don't want to think about it too much, so
+I built this app instead.
 
 License
 =======
