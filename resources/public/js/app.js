@@ -22,12 +22,7 @@ compostApp.config([
             });
     }])
     .run(function($rootScope, $location, authService) {
-        // When the route changes, load data from persistent storage.
         $rootScope.$on("$routeChangeStart", function (event, next, current) {
-            if(!authService.getUser()) {
-                authService.tryAutoLogin();
-            } else {
-                console.log("Already logged in");
-            }
+            authService.checkLogIn();
         });
     });
