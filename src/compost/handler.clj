@@ -17,7 +17,7 @@
 (def Food {(s/optional-key :_id) (s/named String "The ID of this food")
            :name (s/named String "The name of this food")
            :created (s/named String "The ISO date that this food was created on")
-           :expiry (s/named String "The ISO date that this food expires on")})
+           :expires (s/named String "The ISO date that this food expires on")})
 
 (defn sanitize-db-object [obj]
   "Sanitize a database object by replacing MongoDB IDs with strings."
@@ -71,7 +71,18 @@
   (route/resources "/")
   (route/not-found (resp/resource-response "404.html" {:root "public"})))
 
+(defn logging-middleware [handler]
+  (let [requests (atom 0)]
+    (fn [request]
+      (let [request-id (swap! requests inc)]
+        (println "REQUEST" request-id (pr-str request))
+        (let [response (handler request)]
+          (println "RESPONSE" request-id (pr-str response))
+          response)))))
+
 (def app (-> app-routes
              (auth/friend-middleware users)
              (wrap-json-response)
-             (wrap-json-body {:keywords? true})))
+             (wrap-json-body {:keywords? true})
+             (handler/api)
+             (logging-middleware)))
