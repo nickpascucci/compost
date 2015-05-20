@@ -1,7 +1,5 @@
 var compostServices = angular.module("compostServices", ["ngResource"]);
 
-// TODO Implement remaining API surface and migrate from Firebase.
-// TODO Replace Firebase auth with Google OAuth.
 compostServices.factory('UserFoods', function($resource) {
     return $resource('api/v1/people/me/foods/:id', {id: '@id'});
 });
@@ -9,9 +7,11 @@ compostServices.factory('UserFoods', function($resource) {
 compostServices.factory("authService", function($location, $rootScope) {    
     var service = {
         user: JSON.parse(sessionStorage.getItem('user')),
+        auth_info: JSON.parse(sessionStorage.getItem('auth_info')),
         logIn: function () {
             service.user = JSON.parse(sessionStorage.getItem('user'));
-            if (service.user) {
+            service.auth_info = JSON.parse(sessionStorage.getItem('auth_info'));
+            if (service.user && service.auth_info) {
                 console.log("User is already logged in.");
                 $location.path("/foods");
                 return;
@@ -37,21 +37,27 @@ compostServices.factory("authService", function($location, $rootScope) {
         getUser: function() {
             return service.user;
         },
+        isLoggedIn: function() {
+            if (service.getUser() != undefined) {
+                return true;
+            }
+            return false;
+        },
         checkLogIn: function() {
             if (!service.getUser()) {
                 console.log("User is not logged in, redirecting to login page.");
                 $location.path("/login");
             }
         },
-        onEmailResponse: function (response) {
-            for (var i=0; i < response.emails.length; i++) {
-                if (response.emails[i].type === 'account') {
-                    primaryEmail = response.emails[i].value;
+        onEmailResponse: function (result) {
+            for (var i=0; i < result.emails.length; i++) {
+                if (result.emails[i].type === 'account') {
+                    primaryEmail = result.emails[i].value;
                 }
             }
-            service.user = response;
+            service.user = result;
             console.log("Logged in as ", service.user.displayName);
-            sessionStorage.setItem('user', JSON.stringify(response));
+            sessionStorage.setItem('user', JSON.stringify(result));
             // TODO Redirect to the path where we came from
             $location.path("/foods");
             $rootScope.$apply();
@@ -63,17 +69,40 @@ compostServices.factory("authService", function($location, $rootScope) {
             console.log('Auth Result:', result);
             if (result['status']['signed_in']) {
                 gapi.client.load('plus', 'v1', service.onApiClientLoaded);
+                service.auth_info = result;
+                sessionStorage.setItem('auth_info', JSON.stringify(result));
             } else {
                 // Update the app to reflect a signed out user
                 // Possible error values:
                 //   "user_signed_out" - User is signned-out
                 //   "access_denied" - User denied access to your app
                 //   "immediate_failed" - Could not automatically log in the user
-                $location.path("/login");
                 console.log('Sign-in state: ' + result['error']);
+                service.logOut();
+            }
+        },
+        getToken: function() {
+            if (service.auth_info) {
+                return service.auth_info.access_token;
             }
         }
     };
 
     return service;
 });
+
+/**
+   This interceptor adds OAuth credentials to any outbound request if it has them.
+*/
+compostServices.run(['authService', '$injector', function(authService, $injector) {
+    $injector.get("$http").defaults.transformRequest.push(function(data, headersGetter, status) {
+        var token = authService.getToken();
+        if (token != undefined) {
+            headersGetter()['Authorization'] = "OAuth " + token;
+            console.log("Making authenticated request:", data, headersGetter(), status);
+        } else {
+            console.log("Making unauthenticated request:", data, headersGetter(), status);
+        }
+        return data;
+    });
+}]);
