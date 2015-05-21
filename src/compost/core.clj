@@ -45,8 +45,11 @@
           {:port port :join? false})
          :port port))
 
+(defn stop-server! []
+  ((:server @server-handle)))
+
 (defn restart-server! []
-  ((:server @server-handle))
+  (stop-server!)
   (start-server! (:port @server-handle)))
 
 (defn -main [& [port db-uri]]
@@ -56,5 +59,4 @@
     (start-server! port)))
 
 ;; For interactive development:
-;; (.stop server)
-;; (def server (-main))
+;; (-main)

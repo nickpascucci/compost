@@ -37,7 +37,7 @@
            :roles #{:user}}})
 
 (defresource user-foods-resource
-  ;; :base r/authenticated-base
+  :base r/authenticated-base
   :available-media-types ["application/json"]
   :allowed-methods [:post :get]
   :handle-ok (fn [ctx] (map sanitize-db-object (mc/find-maps "foods")))
@@ -53,7 +53,7 @@
                      (format "/api/v1/people/me/foods/%s" (:id (::data ctx)))}))
 
 (defresource food-resource [food-id]
-  ;; :base r/authenticated-base
+  :base r/authenticated-base
   :available-media-types ["application/json"]
   :allowed-methods [:get :delete]
   :exists? (fn [_]
@@ -74,10 +74,13 @@
 (defn logging-middleware [handler]
   (let [requests (atom 0)]
     (fn [request]
-      (let [request-id (swap! requests inc)]
+      (let [request-id (swap! requests inc)
+            start-time (System/currentTimeMillis)]
         (println "REQUEST" request-id (pr-str request))
         (let [response (handler request)]
-          (println "RESPONSE" request-id (pr-str response))
+          (println "RESPONSE" request-id
+                   (str "[" (- (System/currentTimeMillis) start-time) "ms]")
+                   (pr-str response))
           response)))))
 
 (def app (-> app-routes

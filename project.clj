@@ -3,6 +3,7 @@
   :url "http://www.nickpascucci.com"
   :license {:name "Confidential and Proprietary" :url "http://www.nickpascucci.com"}
   :dependencies [
+                 [clj-http "1.0.1"]
                  [com.cemerick/friend "0.2.1"]
                  [com.novemberain/monger "1.7.0"]
                  [compojure "1.1.6"]
