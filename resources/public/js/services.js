@@ -30,7 +30,9 @@ compostServices.factory("authService", function($location, $rootScope) {
         logOut: function () {
             gapi.auth.signOut();
             sessionStorage.removeItem('user');
+            sessionStorage.removeItem('auth_info');
             service.user = null;
+            service.auth_info = null;
             console.log("Logged out");
             $location.path("/login");
         },
@@ -102,6 +104,14 @@ compostServices.run(['authService', '$injector', function(authService, $injector
             console.log("Making authenticated request:", data, headersGetter(), status);
         } else {
             console.log("Making unauthenticated request:", data, headersGetter(), status);
+        }
+        return data;
+    });
+
+    $injector.get("$http").defaults.transformResponse.push(function(data, headersGetter, status) {
+        if (headersGetter()['status'] === 401) {
+            console.log("Server replied with 401, logging out.");
+            authService.logOut();
         }
         return data;
     });
