@@ -17,7 +17,11 @@
 (def Food {(s/optional-key :_id) (s/named String "The ID of this food")
            :name (s/named String "The name of this food")
            :created (s/named String "The ISO date that this food was created on")
-           :expires (s/named String "The ISO date that this food expires on")})
+           :expires (s/named String "The ISO date that this food expires on")
+           :owner (s/named String "The owner of this food")})
+
+(def User {(s/optional-key :_id) (s/named String "The user's id")
+           :email (s/named String "The user's email address")})
 
 (defn sanitize-db-object [obj]
   "Sanitize a database object by replacing MongoDB IDs with strings."
@@ -27,20 +31,35 @@
 (defn sanitize-input [input]
   (dissoc input :id))
 
-(def users
-  "dummy in-memory user database."
-  {"root" {:username "root"
-           :password (creds/hash-bcrypt "admin_password")
-           :roles #{:admin}}
-   "jane" {:username "jane"
-           :password (creds/hash-bcrypt "user_password")
-           :roles #{:user}}})
+(defresource user-resource
+  :base r/authenticated-base
+  :available-media-types ["application/json"]
+  :allowed-methods [:post :get]
+  :exists? (fn [ctx]
+             (let [auth (friend/current-authentication (:request ctx))]
+               (when-let [user (first (mc/find-maps "users" {:email (:identity auth)}))]
+                 {::data (sanitize-db-object user)
+                  ::id (:identity auth)})))
+  :handle-ok ::data
+  :post! (fn [ctx]
+           (let [user (s/validate
+                       User
+                       (sanitize-input (get-in ctx [:request :body])))
+                 auth (friend/current-authentication (:request ctx))]
+             ;; TODO Replace this with malformed? decision point
+             (assert (= (:identity auth) (:email user)))
+             {::data (sanitize-db-object
+                      (mc/insert-and-return "users" user))}))
+  :post-redirect? (fn [ctx]
+                    {:location (format "/api/v1/people/me")}))
 
 (defresource user-foods-resource
   :base r/authenticated-base
   :available-media-types ["application/json"]
   :allowed-methods [:post :get]
-  :handle-ok (fn [ctx] (map sanitize-db-object (mc/find-maps "foods")))
+  :handle-ok (fn [ctx]
+               (let [auth (friend/current-authentication (:request ctx))]
+                 (map sanitize-db-object (mc/find-maps "foods" {:owner (:identity auth)}))))
   :post! (fn [ctx]
            (let [food (s/validate
                        Food
@@ -48,7 +67,6 @@
              {::data (sanitize-db-object
                       (mc/insert-and-return "foods" food))}))
   :post-redirect? (fn [ctx]
-
                     {:location
                      (format "/api/v1/people/me/foods/%s" (:id (::data ctx)))}))
 
@@ -65,6 +83,7 @@
   :handle-ok ::data)
 
 (defroutes app-routes
+  (ANY "/api/v1/people/me" [] user-resource)
   (ANY "/api/v1/people/me/foods" [] user-foods-resource)
   (ANY "/api/v1/people/me/foods/:food-id" [food-id] (food-resource food-id))
   (GET "/" [] (resp/resource-response "index.html" {:root "public"}))
