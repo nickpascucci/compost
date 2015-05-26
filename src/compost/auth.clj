@@ -44,9 +44,17 @@
           (println "Authorization failed: ")
           {:status 400 :body "Malformed Authorization header for OAuth authentication."})))))
 
+(defn constant-middleware
+  "Returns a middleware which treats all requests as though they were authenticated as the provided
+  user."
+  [handler user]
+  (fn [request]
+    (println "Treating request as authenticated by user" (pr-str user))
+    (handler (friend/merge-authentication request user))))
+
 (defn friend-middleware
   "Returns a middleware that enables authentication via Friend."
-  [handler users]
+  [handler]
   (-> handler
       (friend/authenticate {:credential-fn oauth-credential-fn
                             :workflows [(google-oauth)]})))
