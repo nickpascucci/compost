@@ -19,7 +19,9 @@
            :created (s/named String "The ISO date that this food was created on")
            :expires (s/named String "The ISO date that this food expires on")
            :owner (s/named String "The owner of this food")
-           (s/optional-key :frozen?) (s/named Boolean "Whether this food is frozen")})
+           (s/optional-key :frozen?) (s/named Boolean "Whether this food is frozen")
+           (s/optional-key :thaw-ttl-days)
+           (s/named Number "How long this food will last when thawed, in days")})
 
 (def User {(s/optional-key :_id) (s/named String "The user's id")
            :email (s/named String "The user's email address")})

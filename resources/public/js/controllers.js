@@ -1,6 +1,7 @@
 var compostControllers = angular.module("compostControllers", ["compostServices"]);
 
 var storageKey = "ModelData";
+var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
 
 compostControllers.controller("AuthCtrl", function($scope, authService) {
     $scope.logIn = function () {
@@ -45,11 +46,16 @@ compostControllers.controller(
 
         $scope.itemFrozen = function (food) {
             food["frozen?"] = true;
+            var now = moment().startOf("day");
+            food["thaw-ttl-days"] = moment(food["expires"]).diff(now, "days");
+            food["expires"] = momentToIsoString(now.clone().add("days", FREEZING_EXTENSION));
             food.$save();
         };
 
         $scope.itemThawed = function (food) {
             food["frozen?"] = false;
+            var now = moment().startOf("day");
+            food["expires"] = momentToIsoString(now.clone().add("days", food["thaw-ttl-days"]));
             food.$save();
         };
 
