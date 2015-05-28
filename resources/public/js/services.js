@@ -98,26 +98,35 @@ compostServices.factory("authService", function($location, $rootScope) {
     return service;
 });
 
-/**
-   This interceptor adds OAuth credentials to any outbound request if it has them.
-*/
-compostServices.run(['authService', '$injector', function(authService, $injector) {
-    $injector.get("$http").defaults.transformRequest.push(function(data, headersGetter, status) {
-        var token = authService.getToken();
-        if (token != undefined) {
-            headersGetter()['Authorization'] = "OAuth " + token;
-            console.log("Making authenticated request:", data, headersGetter(), status);
-        } else {
-            console.log("Making unauthenticated request:", data, headersGetter(), status);
-        }
-        return data;
-    });
+compostServices.factory('authHttpInterceptor', function($q, authService) {
+    return {
+        request: function(config) {
+            var token = authService.getToken();
+            if (token != undefined) {
+                config.headers['Authorization'] = "OAuth " + token;
+                console.log("Making authenticated request:", config);
+            } else {
+                console.log("Making unauthenticated request:", config);
+            }
 
-    $injector.get("$http").defaults.transformResponse.push(function(data, headersGetter, status) {
-        if (headersGetter()['status'] === 401) {
-            console.log("Server replied with 401, logging out.");
-            authService.logOut();
+            return config;
+        },
+        requestError: function(rejection) {
+            return $q.reject(rejection);
+        },
+        response: function(response) {
+            return response;
+        },
+        responseError: function(response) {
+            if (response.status === 401) {
+                console.log("Server replied with 401, logging out.");
+                authService.logOut();
+            }
+            return $q.reject(rejection);
         }
-        return data;
-    });
+    };
+});
+
+compostServices.config(['$httpProvider', function($httpProvider) {
+    $httpProvider.interceptors.push('authHttpInterceptor');
 }]);
