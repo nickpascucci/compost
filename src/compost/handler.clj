@@ -14,11 +14,12 @@
    [schema.core :as s])
   (:import [org.bson.types ObjectId]))
 
-(def Food {(s/optional-key :_id) (s/named String "The ID of this food")
+(def Food {(s/optional-key :_id) (s/named ObjectId "The ID of this food")
            :name (s/named String "The name of this food")
            :created (s/named String "The ISO date that this food was created on")
            :expires (s/named String "The ISO date that this food expires on")
-           :owner (s/named String "The owner of this food")})
+           :owner (s/named String "The owner of this food")
+           (s/optional-key :frozen?) (s/named Boolean "Whether this food is frozen")})
 
 (def User {(s/optional-key :_id) (s/named String "The user's id")
            :email (s/named String "The user's email address")})
@@ -29,7 +30,11 @@
     (assoc (dissoc obj :_id) :id id)))
 
 (defn sanitize-input [input]
-  (dissoc input :id))
+  (let [input-id (:id input)
+        id (when input-id (ObjectId. input-id))]
+    (if id
+      (assoc (dissoc input :id) :_id id)
+      (dissoc input :id))))
 
 (defresource user-resource
   :base r/authenticated-base
@@ -73,12 +78,21 @@
 (defresource food-resource [food-id]
   :base r/authenticated-base
   :available-media-types ["application/json"]
-  :allowed-methods [:get :delete]
+  :allowed-methods [:get :delete :post]
   :exists? (fn [_]
              (println "Looking up food" food-id)
              (when-let [d (mc/find-map-by-id "foods" (ObjectId. food-id))]
                {::data (sanitize-db-object d)
                 ::id food-id}))
+  :post! (fn [ctx]
+           (let [food (s/validate
+                       Food
+                       (sanitize-input (get-in ctx [:request :body])))]
+             (mc/update-by-id "foods" (:_id food) food)
+             {::data (sanitize-db-object food)}))
+  :post-redirect? (fn [ctx]
+                    {:location
+                     (format "/api/v1/people/me/foods/%s" (:id (::data ctx)))})
   :delete! (fn [ctx] (mc/remove-by-id "foods" (ObjectId. food-id)))
   :handle-ok ::data)
 

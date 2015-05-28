@@ -39,6 +39,11 @@ compostServices.factory("authService", function($location, $rootScope) {
         getUser: function() {
             return service.user;
         },
+        getUserEmail: function() {
+            return service.user.emails.filter(function (x) {
+                return x.type === "account";
+            })[0].value;
+        },
         isLoggedIn: function() {
             if (service.getUser() != undefined) {
                 return true;

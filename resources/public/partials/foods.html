@@ -6,7 +6,8 @@
   <div ng-class="{'card': true, 'show-back': selectedItem == food.id, 'show-front': selectedItem != food.id}"
        ng-repeat="food in foods | orderBy : getDaysToExpiry"
        ng-click="itemClicked(food)">
-    <div class="card-front">
+    <div ng-class="{'card-front': true,
+                   'frozen': getIsFrozen(food)}">
       <div class="left one-third status">
         <h1 ng-class="{'expire-3': getDaysToExpiry(food) <= 1,
                       'expire-2': getDaysToExpiry(food) > 1 && getDaysToExpiry(food) < 3,
@@ -17,6 +18,11 @@
         <h1>{{food.name}}</h1>
         <p>Expires {{getExpirationDate(food)}}</p>
         <p>Added {{getAge(food)}} days ago</p>
+        <p ng-if="getIsFrozen(food)">
+          <img src="/img/snowflake.png" alt="Frozen" class="small-icon" />
+          FROZEN
+          <img src="/img/snowflake.png" alt="Frozen" class="small-icon" />
+        </p>
       </div>
     </div>
     <div class="card-back">
@@ -24,9 +30,28 @@
         <div class="cancel">Cancel</div>
       </div>
       <div class="right two-thirds">
-        <div class="remove" ng-click="itemRemoved(food)">
-          <div class="remove-button">
-            Remove Item
+        <div class="left half-width">
+          <div class="card-button half-height top" ng-click="itemFrozen(food)" ng-if="!getIsFrozen(food)">
+            <img src="/img/snowflake.png" alt="Freeze" />
+            Freeze
+          </div>
+          <div class="card-button half-height top" ng-click="itemThawed(food)" ng-if="getIsFrozen(food)">
+            <img src="/img/fire.png" alt="Freeze" />
+            Thaw
+          </div>
+          <div class="card-button half-height bottom" ng-click="showNotes(food)">
+            <img src="/img/notes.png" alt="Notes" />
+            Notes
+          </div>
+        </div>
+        <div class="right half-width">
+          <div class="top card-button half-height" ng-click="itemConsumed(food)">
+            <img src="/img/cutlery.png" alt="Eat" />
+            Eat
+          </div>
+          <div class="bottom card-button half-height"  ng-click="itemRemoved(food)">
+            <img src="/img/trash.png" alt="Trash" />
+            Trash
           </div>
         </div>
       </div>

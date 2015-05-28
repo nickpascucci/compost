@@ -35,12 +35,12 @@ input {
 }
 
 .expire-1 {
-    color: rgba(8, 199, 0, 1);
+    color: rgba(25, 140, 0, 1);
     font-weight: 300;
 }
 
 .expire-2 {
-    color: rgba(206, 191, 27, 1);
+    color: rgba(247, 169, 0, 1);
     font-weight: 300;
 }
 
@@ -77,12 +77,20 @@ input {
     width: 66%;
 }
 
-.half {
+.half-width {
     width: 49%;
+}
+
+.half-height {
+    height: 49%;
 }
 
 .bottom {
     bottom: 0px;
+}
+
+.top {
+    top: 0px;
 }
 
 .left {
@@ -104,9 +112,19 @@ input {
     border-left-style: solid;
 }
 
+.small-icon {
+    height: 15px;
+    width: 15px;
+}
+
+.frozen {
+    background: #D4E7F7;
+}
+
 @media all and (min-width: 520px) {
     .card {
         background: #F7F7F7;
+        cursor: default;
         padding: 0px;
         margin: 15px;
         width: 500px;
@@ -116,6 +134,10 @@ input {
         border: 1px black;
         border-style: solid;
         float: left;
+    }
+
+    .card:hover {
+        box-shadow: rgba(0, 0, 0, 0.11) 3px 3px;
     }
 
     .add-form {
@@ -145,12 +167,11 @@ input {
         position: absolute;
     }
 
-    .remove-button {
+    .card-button {
         font-size: 2.0em;
-        position: absolute;
-        margin-top: -30px;
+        margin-top: 25px;
         top: 50%;
-        right: 40px;
+        right: 70px;
     }
 
     .save-button {
@@ -181,6 +202,7 @@ input {
 @media all and (max-width: 520px) {
     .card {
         background: #F7F7F7;
+        cursor: default;
         margin: 15px 0px;
         width: 100%;
         height: 270px;
@@ -219,12 +241,11 @@ input {
         position: absolute;
     }
 
-    .remove-button {
+    .card-button {
         font-size: 2.0em;
-        position: absolute;
-        margin-top: -30px;
+        margin-top: 25px;
         top: 50%;
-        right: 20px;
+        right: 70px;
     }
 
     .save-button {
@@ -316,7 +337,7 @@ input {
 }
 
 .primary-action {
-    background: rgba(2, 150, 2, 0.95);
+    background: rgba(25, 140, 0, 1);
     padding: 0px;
     position: fixed;
     bottom: 0px;

@@ -32,10 +32,35 @@ compostControllers.controller(
         };
 
         // When the "Remove" button is clicked, remove the element.
+        $scope.itemConsumed = function (food) {
+            food.$delete();
+            $scope.foods = $scope.foods.filter(function (f) { return f.id != food.id });
+        };
+
+        // TODO: Count a "consumed" removal separately from a "trashed" removal
         $scope.itemRemoved = function (food) {
             food.$delete();
             $scope.foods = $scope.foods.filter(function (f) { return f.id != food.id });
         };
+
+        $scope.itemFrozen = function (food) {
+            food["frozen?"] = true;
+            food.$save();
+        };
+
+        $scope.itemThawed = function (food) {
+            food["frozen?"] = false;
+            food.$save();
+        };
+
+        $scope.showNotes = function (food) {
+            // TODO Handle showing notes
+        };
+
+        $scope.getIsFrozen = function (food) {
+            var frozen = false || food["frozen?"];
+            return frozen;
+        }
 
         $scope.getAge = function (food) {
             return getDaysUntil(momentFromIsoString(food.created), moment().startOf("day"));
@@ -68,6 +93,8 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, authSe
         "name": "New Food",
         "created": momentToIsoString(moment().startOf("day")),
         "expires": momentToIsoString($scope.now.clone().add("days", $scope.daysToExpiry)),
+        "owner": authService.getUserEmail(),
+        "frozen?": false,
     };
 
     // When the "Save" button is clicked, add the food to our list.
