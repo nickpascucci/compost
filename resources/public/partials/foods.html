@@ -2,9 +2,13 @@
   <div class="" ng-controller="AuthCtrl">
     <input class="logout-button" type="button" name="" value="Log Out" ng-click="logOut()"/>
   </div>
+
+  <div class="center" ng-if="getActiveFoods(foods).length == 0">
+    There are no foods here! Click "New" below to add one.
+  </div>
   
   <div ng-class="{'card': true, 'show-back': selectedItem == food.id, 'show-front': selectedItem != food.id}"
-       ng-repeat="food in foods | filter: {'status': 'active'} | orderBy : getDaysToExpiry"
+       ng-repeat="food in getActiveFoods(foods) | orderBy : getDaysToExpiry"
        ng-click="itemClicked(food)">
     <div ng-class="{'card-front': true,
                    'frozen': getIsFrozen(food)}">

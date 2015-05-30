@@ -20,6 +20,12 @@ compostControllers.controller(
         authService.checkLogIn();
         $scope.foods = UserFoods.query();
 
+        $scope.getActiveFoods = function (foods) {
+            return foods.filter(function(e, i, a) {
+                return e["status"] === "active";
+            });
+        };
+
         // ID of selected item.
         $scope.selectedItem = 0;
 

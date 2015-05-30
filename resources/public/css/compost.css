@@ -107,6 +107,11 @@ input {
     height: 100%;
 }
 
+.center {
+    text-align: center;
+    margin: auto;
+}
+
 .left-border {
     border-left: 1px white;
     border-left-style: solid;
