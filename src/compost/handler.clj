@@ -9,6 +9,7 @@
    [compost.resources :as r :refer [defresource]]
    [liberator.core :as lb]
    [monger.collection :as mc]
+   [monger.operators :refer :all]
    [ring.middleware.json :refer [wrap-json-response wrap-json-body]]
    [ring.util.response :as resp]
    [schema.core :as s])
@@ -99,9 +100,22 @@
   :delete! (fn [ctx] (mc/remove-by-id "foods" (ObjectId. food-id)))
   :handle-ok ::data)
 
+(defresource food-search-resource
+  :base r/authenticated-base
+  :available-media-types ["application/json"]
+  :allowed-methods [:get]
+  :handle-ok (fn [ctx]
+               (let [params (:query-params (:request ctx))
+                     auth (friend/current-authentication (:request ctx))]
+                 (if-let [query (get params "q")]
+                   (map sanitize-db-object
+                        (mc/find-maps "foods" {:name {$regex (str ".*" query ".*")}
+                                               :owner (:identity auth)}))))))
+
 (defroutes app-routes
   (ANY "/api/v1/people/me" [] user-resource)
   (ANY "/api/v1/people/me/foods" [] user-foods-resource)
+  (ANY "/api/v1/people/me/foods/search" [] food-search-resource)
   (ANY "/api/v1/people/me/foods/:food-id" [food-id] (food-resource food-id))
   (GET "/" [] (resp/resource-response "index.html" {:root "public"}))
   (route/resources "/")
