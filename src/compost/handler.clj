@@ -134,7 +134,7 @@
           response)))))
 
 (def app (-> app-routes
-             (auth/friend-middleware users)
+             (auth/friend-middleware)
              (wrap-json-response)
              (wrap-json-body {:keywords? true})
              (handler/api)
