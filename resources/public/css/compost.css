@@ -26,6 +26,11 @@ input {
     font-size: 1.5em;
 }
 
+.help-text {
+    text-align: center;
+    margin: 20px;
+}
+
 .content {
     padding-bottom: 60px;
 }
@@ -105,11 +110,6 @@ input {
     float: right;
     position: relative;
     height: 100%;
-}
-
-.center {
-    text-align: center;
-    margin: auto;
 }
 
 .left-border {
