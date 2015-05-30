@@ -34,14 +34,14 @@ compostControllers.controller(
 
         // When the "Remove" button is clicked, remove the element.
         $scope.itemConsumed = function (food) {
-            food.$delete();
-            $scope.foods = $scope.foods.filter(function (f) { return f.id != food.id });
+            food["status"] = "eaten";
+            food.$save();
         };
 
         // TODO: Count a "consumed" removal separately from a "trashed" removal
         $scope.itemRemoved = function (food) {
-            food.$delete();
-            $scope.foods = $scope.foods.filter(function (f) { return f.id != food.id });
+            food["status"] = "trashed";
+            food.$save();
         };
 
         $scope.itemFrozen = function (food) {
@@ -100,6 +100,7 @@ compostControllers.controller("AddFoodCtrl", function ($scope, $location, authSe
         "created": momentToIsoString(moment().startOf("day")),
         "expires": momentToIsoString($scope.now.clone().add("days", $scope.daysToExpiry)),
         "owner": authService.getUserEmail(),
+        "status": "active",
         "frozen?": false,
     };
 

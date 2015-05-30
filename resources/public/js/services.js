@@ -122,7 +122,7 @@ compostServices.factory('authHttpInterceptor', function($q, authService) {
                 console.log("Server replied with 401, logging out.");
                 authService.logOut();
             }
-            return $q.reject(rejection);
+            return $q.reject(response);
         }
     };
 });

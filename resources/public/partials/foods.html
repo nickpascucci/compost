@@ -4,7 +4,7 @@
   </div>
   
   <div ng-class="{'card': true, 'show-back': selectedItem == food.id, 'show-front': selectedItem != food.id}"
-       ng-repeat="food in foods | orderBy : getDaysToExpiry"
+       ng-repeat="food in foods | filter: {'status': 'active'} | orderBy : getDaysToExpiry"
        ng-click="itemClicked(food)">
     <div ng-class="{'card-front': true,
                    'frozen': getIsFrozen(food)}">
