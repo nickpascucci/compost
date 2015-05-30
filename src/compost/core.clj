@@ -54,7 +54,7 @@
 
 (defn -main [& [port db-uri]]
   (let [port (Integer. (or port (env :port) 5000))
-        db-uri (or db-uri (env :mongohq-url) "mongodb://127.0.0.1/compost")]
+        db-uri (or db-uri (env :mongolab-uri) "mongodb://127.0.0.1/compost")]
     (init-db! db-uri)
     (start-server! port)))
 
