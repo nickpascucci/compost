@@ -138,4 +138,5 @@
              (wrap-json-response)
              (wrap-json-body {:keywords? true})
              (handler/api)
+             (auth/https-required-middleware)
              (logging-middleware)))

@@ -58,3 +58,16 @@
   (-> handler
       (friend/authenticate {:credential-fn oauth-credential-fn
                             :workflows [(google-oauth)]})))
+
+(defn https-url [request]
+  "Get the HTTPS version of a request URL."
+  (str "https://" (:server-name request) ":" (:server-port request) (:uri request)))
+
+(defn https-required-middleware [handler]
+  "Middleware which redirects to HTTPS URLs."
+  (fn [request]
+    (if (= (:scheme request) :http)
+      (do
+        (println "Redirecting request to HTTPS")
+        (ring.util.response/redirect (https-url request)))
+      (handler request))))
