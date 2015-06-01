@@ -7,6 +7,7 @@
    [compojure.route :as route]
    [compost.auth :as auth]
    [compost.resources :as r :refer [defresource]]
+   [environ.core :refer [env]]
    [liberator.core :as lb]
    [monger.collection :as mc]
    [monger.operators :refer :all]
@@ -138,5 +139,5 @@
              (wrap-json-response)
              (wrap-json-body {:keywords? true})
              (handler/api)
-             (auth/https-required-middleware)
+             ((fn [r] (if (env :development) r (auth/https-required-middleware r))))
              (logging-middleware)))
