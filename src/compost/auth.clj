@@ -103,7 +103,7 @@
 (defn https-url [request]
   "Get the HTTPS version of a request URL."
   (str "https://" (:server-name request)
-       (if (!= 80 (:server-port request)) (str ":" (:server-port request)) "")
+       (if (= 80 (:server-port request)) "" (str ":" (:server-port request)))
        (:uri request)))
 
 (defn https-required-middleware [handler]
