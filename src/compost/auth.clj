@@ -109,7 +109,9 @@
 (defn https-required-middleware [handler]
   "Middleware which redirects to HTTPS URLs."
   (fn [request]
-    (if (= (:scheme request) :http)
+    (if (and (= (:scheme request) :http)
+             ;; Heroku terminates SSL themselves, but sets the original protocol in the headers.
+             (not (= "https" (get-in request [:headers "x-forwarded-proto"]))))
       (do
         (println "Redirecting request to HTTPS")
         (ring.util.response/redirect (https-url request)))
