@@ -57,11 +57,6 @@ compostServices.factory("authService", function($location, $rootScope) {
             }
         },
         onEmailResponse: function (result) {
-            for (var i=0; i < result.emails.length; i++) {
-                if (result.emails[i].type === 'account') {
-                    primaryEmail = result.emails[i].value;
-                }
-            }
             service.user = result;
             console.log("Logged in as ", service.user.displayName);
             sessionStorage.setItem('user', JSON.stringify(result));

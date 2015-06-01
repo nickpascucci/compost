@@ -306,6 +306,14 @@ input {
     width: 90%;
 }
 
+.login {
+    width: 200px;
+    margin-left: -100px;
+    position: absolute;
+    left: 50%;
+    top: 30%;
+}
+
 .login-button {
     font-size: 2em;
     width: 200px;

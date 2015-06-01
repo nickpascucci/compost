@@ -1,15 +1,50 @@
 var compostControllers = angular.module("compostControllers", ["compostServices"]);
 
-var storageKey = "ModelData";
 var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
 
 compostControllers.controller("AuthCtrl", function($scope, authService) {
-    $scope.logIn = function () {
-        authService.logIn();
-    },
+    $scope.immediateFailed = true;
+    $scope.signIn = function(authResult) {
+        $scope.$apply(function() {
+            $scope.processAuth(authResult);
+        });
+    }
+
+    $scope.processAuth = function(authResult) {
+        $scope.immediateFailed = true;
+        if ($scope.isSignedIn) {
+            return 0;
+        }
+        if (authResult['access_token']) {
+            $scope.immediateFailed = false;
+            // Successfully authorized, create session
+            authService.onSuccessfulLogin(authResult);
+        } else if (authResult['error']) {
+            if (authResult['error'] == 'immediate_failed') {
+                $scope.immediateFailed = true;
+            } else {
+                console.log('Error:' + authResult['error']);
+            }
+        }
+    }
+
+    $scope.renderSignIn = function() {
+        gapi.signin.render('gsignin', {
+            'callback': $scope.signIn,
+            'clientid': '564625248083-vrmpbbdr39uelvr3iirme4vuc5kckeu7.apps.googleusercontent.com',
+            'cookiepolicy': 'single_host_origin',
+            'scope': 'profile',
+            'theme': 'dark',
+            'width': 'wide',
+        });
+    }
+
     $scope.logOut = function () {
+        $scope.immediateFailed = true;
         authService.logOut();
     }
+
+    $scope.renderSignIn();
 });
 
 /*
