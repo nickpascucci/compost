@@ -90,7 +90,7 @@ compostServices.factory("authService", function($location, $rootScope) {
         },
         getToken: function() {
             if (service.auth_info) {
-                return service.auth_info.access_token;
+                return service.auth_info.id_token;
             }
         }
     };
@@ -103,7 +103,7 @@ compostServices.factory('authHttpInterceptor', function($q, authService) {
         request: function(config) {
             var token = authService.getToken();
             if (token != undefined) {
-                config.headers['Authorization'] = "OAuth " + token;
+                config.headers['Authorization'] = "Bearer " + token;
                 console.log("Making authenticated request:", config);
             } else {
                 console.log("Making unauthenticated request:", config);

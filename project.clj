@@ -4,6 +4,7 @@
   :license {:name "Confidential and Proprietary" :url "http://www.nickpascucci.com"}
   :dependencies [
                  [clj-http "1.0.1"]
+                 [clj-jwt "0.0.13"]
                  [com.cemerick/friend "0.2.1"]
                  [com.novemberain/monger "1.7.0"]
                  [compojure "1.1.6"]
@@ -13,6 +14,7 @@
                  [liberator "0.10.0"]
                  [org.clojure/clojure "1.5.1"]
                  [org.clojure/core.async "0.1.338.0-5c5012-alpha"]
+                 [org.clojure/core.cache "0.6.4"]
                  [prismatic/dommy "0.1.2"]
                  [prismatic/schema "0.2.1"]
                  [ring-basic-authentication "1.0.1"]

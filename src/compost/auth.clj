@@ -3,35 +3,76 @@
             (cemerick.friend [workflows :as workflows]
                              [credentials :as creds]
                              [util :as util])
-            [clj-http.client :as http]))
+            [clj-http.client :as http]
+            [clj-jwt.core :as jwt]
+            [clj-jwt.key :as jwt-key]
+            [clj-jwt.base64 :as b64]
+            [clj-time.core :refer [now plus days]]
+            [clojure.core.cache :as cache]
+            [clojure.java.io :as io])
+  (:import [java.security KeyFactory]
+           [java.security.spec RSAPublicKeySpec]))
+
+(def google-oauth-discovery-url "https://accounts.google.com/.well-known/openid-configuration")
+ ;; Refresh certificates every 12h
+(def cert-cache (atom (cache/ttl-cache-factory {} :ttl (* 1000 60 60 12))))
+
+(defn get-google-oauth-config []
+  (http/get google-oauth-discovery-url
+            {:as :json
+             :coerce :always
+             :throw-exceptions false}))
+
+(defn fetch-google-creds! []
+  "Gets the Google signing certificate as a string, caching it if possible."
+  (swap! cert-cache
+         (fn [C] (if (cache/has? C :certificate)
+                      (cache/hit C :certificate)
+                      (cache/miss C :certificate
+                                  (let [config (get-google-oauth-config)
+                                        _ (println "Retrieved certificate URIs:" config)
+                                        keys-uri (get-in config [:body :jwks_uri])
+                                        keys (http/get keys-uri
+                                                       {:as :json
+                                                        :coerce :always
+                                                        :throw-exceptions false})]
+                                    keys))))))
+
+(let [key-factory (KeyFactory/getInstance "RSA")
+      gen-key #(.generatePublic key-factory %)]
+  (defn load-rsa-key [modulus exponent]
+    "Load an RSA key from the modulus and exponent."
+    (gen-key (RSAPublicKeySpec. modulus exponent))))
+
+(defn fetch-google-signing-key! [kid]
+  (let [creds (fetch-google-creds!)
+        keydata (first (filter (fn [key] (= (:kid key) kid))
+                                     (get-in creds [:certificate :body :keys])))
+        modulus (BigInteger. (b64/decode (:n keydata)))
+        exponent (BigInteger. (b64/decode (:e keydata)))]
+    (load-rsa-key modulus exponent)))
 
 (defn oauth-credential-fn [& {:keys [token] :as oauth-creds}]
-  ;; TODO: Check that the creds are valid with Google APIs
-  (let [auth-response (http/get "https://www.googleapis.com/plus/v1/people/me"
-                                {:headers {"Authorization" (str "Bearer " token)}
-                                 :as :json
-                                 :coerce :always
-                                 :throw-exceptions false})]
-    (if (= 200 (:status auth-response))
-      (let [email (:value (first (filter
-                                  (fn [addr] (= "account" (:type addr)))
-                                  (:emails (:body auth-response)))))]
-        {:identity email :roles [] :token token})
-      (println "Failed to authorize user"))))
+  (let [decoded-token (jwt/str->jwt token)
+        pub-key (fetch-google-signing-key! (get-in decoded-token [:header :kid]))
+        verified-token (jwt/verify decoded-token :RS256 pub-key)]
+    (println "Decoded token:" (pr-str decoded-token))
+    (let [email (get-in decoded-token [:claims :email])]
+      {:identity email :roles [] :token decoded-token})))
 
 (defn google-oauth [& {:keys [credential-fn] :as oauth-config}]
   "Friend workflow for using Google OAuth."
   (fn [{{:strs [authorization]} :headers :as request}]
-    (when (and authorization (re-matches #"\s*OAuth\s*(.+)" authorization))
+    (when (and authorization (re-matches #"\s*Bearer\s*(.+)" authorization))
       (if-let [[_ token]
-               (try (re-matches #"\s*OAuth\s+(.+)" authorization)
+               (try (re-matches #"\s*Bearer\s+(.+)" authorization)
                     (catch Exception e
                       (println "Invalid Authorization header for OAuth: " authorization)
                       (.printStackTrace e)))]
         (if-let [user-record ((util/gets :credential-fn oauth-config (::friend/auth-config request))
                               :token token)]
           (do
-            (println "Authorization succeeded")
+            (println "Authorization succeeded, user:" (:identity user-record))
             (with-meta user-record
              {::friend/workflow :google-oauth
               ::friend/redirect-on-auth? false
