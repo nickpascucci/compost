@@ -15,7 +15,7 @@
       <div ng-class="{'expire-3': daysToExpiry <= 1,
                      'expire-2': daysToExpiry > 1 && daysToExpiry < 3,
                      'expire-1': daysToExpiry >= 3}">
-        <input class="date-picker" type="date" ng-change="onDateChanged()" ng-model="food.expiresOn"/>
+        <input class="date-picker" type="date" ng-change="onDateChanged()" ng-model="food.expires"/>
       </div>
     </div>
     <input class="date-toggle" ng-click="toggleDateFormat()" type="image" src="img/calendar.png" alt="Switch Date Format"/>
