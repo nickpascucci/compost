@@ -58,8 +58,9 @@
   (let [decoded-token (jwt/str->jwt token)
         pub-key (fetch-google-signing-key! (get-in decoded-token [:header :kid]))]
     (if pub-key
-      (let [verified-token (jwt/verify decoded-token :RS256 pub-key)
-            email (get-in verified-token [:claims :email])]
+      (let [verified? (jwt/verify decoded-token :RS256 pub-key)
+            email (get-in decoded-token [:claims :email])]
+        ;; TODO Integrate with Google JWT libraries
         (println "Decoded token:" (pr-str decoded-token))
         {:identity email :roles [] :token decoded-token})
       (do
