@@ -46,19 +46,25 @@
 
 (defn fetch-google-signing-key! [kid]
   (let [creds (fetch-google-creds!)
+        _ (println "Fetched Google creds:" (pr-str creds))
         keydata (first (filter (fn [key] (= (:kid key) kid))
-                                     (get-in creds [:certificate :body :keys])))
-        modulus (BigInteger. (b64/decode (:n keydata)))
-        exponent (BigInteger. (b64/decode (:e keydata)))]
-    (load-rsa-key modulus exponent)))
+                               (get-in creds [:certificate :body :keys])))]
+    (when keydata
+      (let [modulus (BigInteger. (b64/decode (:n keydata)))
+            exponent (BigInteger. (b64/decode (:e keydata)))]
+        (load-rsa-key modulus exponent)))))
 
 (defn oauth-credential-fn [& {:keys [token] :as oauth-creds}]
   (let [decoded-token (jwt/str->jwt token)
-        pub-key (fetch-google-signing-key! (get-in decoded-token [:header :kid]))
-        verified-token (jwt/verify decoded-token :RS256 pub-key)]
-    (println "Decoded token:" (pr-str decoded-token))
-    (let [email (get-in decoded-token [:claims :email])]
-      {:identity email :roles [] :token decoded-token})))
+        pub-key (fetch-google-signing-key! (get-in decoded-token [:header :kid]))]
+    (if pub-key
+      (let [verified-token (jwt/verify decoded-token :RS256 pub-key)
+            email (get-in verified-token [:claims :email])]
+        (println "Decoded token:" (pr-str decoded-token))
+        {:identity email :roles [] :token decoded-token})
+      (do
+        (println "No matching public key for token - the token is most likely expired.")
+        nil))))
 
 (defn google-oauth [& {:keys [credential-fn] :as oauth-config}]
   "Friend workflow for using Google OAuth."
