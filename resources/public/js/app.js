@@ -1,5 +1,6 @@
 var compostApp = angular.module("compostApp", [
     "ngRoute",
+    "ngMaterial",
     "compostControllers",
     "compostServices"
 ]);
@@ -14,9 +15,6 @@ compostApp.config([
             }).when("/login", {
                 templateUrl: "partials/login.html",
                 controller: "AuthCtrl"
-            }).when("/add", {
-                templateUrl: "partials/add.html",
-                controller: "AddFoodCtrl"
             }).otherwise({
                 redirectTo: "/login"
             });

@@ -1,0 +1,23 @@
+<md-dialog>
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h2>Edit Food</h2>
+    </div>
+  </md-toolbar>
+  <md-dialog-content>
+    <md-input-container>
+      <label>Name</label>
+      <input ng-model="editorCtrl.food.name" type="text"/>
+    </md-input-container>
+    <md-input-container>
+      <label>Days until it expires</label>
+      <input ng-model="editorCtrl.daysToExpiry"
+             ng-change="editorCtrl.onDaysToExpiryChanged()"
+             type="number" step="any"/>
+    </md-input-container>    
+    <div class="md-actions">
+      <md-button ng-click="editorCtrl.cancel()">Cancel</md-button>
+      <md-button ng-click="editorCtrl.done()">Done</md-button>
+    </div>
+  </md-dialog-content>
+</md-dialog>

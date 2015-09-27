@@ -139,5 +139,5 @@
              (wrap-json-response)
              (wrap-json-body {:keywords? true})
              (handler/api)
-             ((fn [r] (if (env :development) r (auth/https-required-middleware r))))
+             ;; ((fn [r] (if (env :development) r (auth/https-required-middleware r))))
              (logging-middleware)))

@@ -1,4 +1,8 @@
-var compostControllers = angular.module("compostControllers", ["compostServices"]);
+var compostControllers = angular.module("compostControllers", [
+    "ngMaterial",
+    "editorModule",
+    "compostServices"
+]);
 
 var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
 
@@ -51,8 +55,10 @@ compostControllers.controller("AuthCtrl", function($scope, authService) {
   Controller for the food list view.
 */
 compostControllers.controller(
-    "FoodListCtrl", function ($scope, authService, UserFoods) {
+    "FoodListCtrl", function ($scope, authService, editorService, UserFoods) {
         authService.checkLogIn();
+        this.scope_ = $scope;
+
         $scope.foods = UserFoods.query();
 
         $scope.getActiveFoods = function (foods) {
@@ -63,6 +69,16 @@ compostControllers.controller(
 
         // ID of selected item.
         $scope.selectedItem = 0;
+
+        $scope.addFood = function() {
+            editorService.create()
+                .then(function(food) {
+                    console.log("done editing", food);
+                    UserFoods.save(food, function () {
+                        this.foods.push(food);
+                    }.bind(this));
+                }.bind(this));
+        }
 
         // When an item is clicked, switch sides.
         $scope.itemClicked = function (food) {

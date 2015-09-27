@@ -1,71 +1,84 @@
-<div class="" ng-controller="FoodListCtrl">
-  <div class="" ng-controller="AuthCtrl">
-    <input class="logout-button" type="button" name="" value="Log Out" ng-click="logOut()"/>
-  </div>
-
-  <div class="help-text" ng-if="getActiveFoods(foods).length == 0">
-    There are no foods here! Click "New" below to add one.
-  </div>
-  
-  <div ng-class="{'card': true, 'show-back': selectedItem == food.id, 'show-front': selectedItem != food.id}"
-       ng-repeat="food in getActiveFoods(foods) | orderBy : getDaysToExpiry"
-       ng-click="itemClicked(food)">
-    <div ng-class="{'card-front': true,
-                   'frozen': getIsFrozen(food)}">
-      <div class="left one-third status">
-        <h1 ng-class="{'expire-3': getDaysToExpiry(food) <= 1,
-                      'expire-2': getDaysToExpiry(food) > 1 && getDaysToExpiry(food) < 3,
-                      'expire-1': getDaysToExpiry(food) >= 3}">{{getDaysToExpiry(food)}}</h1>
-        Days Left
-      </div>
-      <div class="right two-thirds description">
-        <h1>{{food.name}}</h1>
-        <p>Expires {{getExpirationDate(food)}}</p>
-        <p>Added {{getAge(food)}} days ago</p>
-        <p ng-if="getIsFrozen(food)">
-          <img src="/img/snowflake.png" alt="Frozen" class="small-icon" />
-          FROZEN
-          <img src="/img/snowflake.png" alt="Frozen" class="small-icon" />
-        </p>
+<div layout="column" ng-controller="FoodListCtrl">
+  <md-toolbar>
+    <div class="md-toolbar-tools">
+      <h3>Dashboard</h3>
+      <span flex></span>
+      <div class="" ng-controller="AuthCtrl" layout-padding>
+        <md-button class="logout-button" ng-click="logOut()">Log Out</md-button>
       </div>
     </div>
-    <div class="card-back">
-      <div class="left one-third">
-        <div class="cancel">Cancel</div>
-      </div>
-      <div class="right two-thirds">
-        <div class="left half-width">
-          <div class="card-button half-height top" ng-click="itemFrozen(food)" ng-if="!getIsFrozen(food)">
-            <img src="/img/snowflake.png" alt="Freeze" />
-            Freeze
-          </div>
-          <div class="card-button half-height top" ng-click="itemThawed(food)" ng-if="getIsFrozen(food)">
-            <img src="/img/fire.png" alt="Freeze" />
-            Thaw
-          </div>
-          <div class="card-button half-height bottom" ng-click="showNotes(food)">
-            <img src="/img/notes.png" alt="Notes" />
-            Notes
-          </div>
-        </div>
-        <div class="right half-width">
-          <div class="top card-button half-height" ng-click="itemConsumed(food)">
-            <img src="/img/cutlery.png" alt="Eat" />
-            Eat
-          </div>
-          <div class="bottom card-button half-height"  ng-click="itemRemoved(food)">
-            <img src="/img/trash.png" alt="Trash" />
-            Trash
-          </div>
-        </div>
-      </div>
+  </md-toolbar>
+  <md-content flex layout-padding>
+    <div class="help-text" ng-if="getActiveFoods(foods).length == 0">
+      There are no foods here! Click "New" below to add one.
     </div>
-  </div>
-  <a href="#/add">
-    <div class="primary-action">
-      <div class="create">
-        New
-      </div>
-    </div>
-  </a>
+    <md-grid-list 
+       md-cols-sm="1" md-cols-md="2" md-cols-lg="3" md-cols-gt-lg="4"
+       md-gutter="15px" md-row-height="20em">
+      <md-grid-tile md-rowspan="1" md-colspan="1"
+                    ng-repeat="food in getActiveFoods(foods) | orderBy : getDaysToExpiry"
+                    ng-click="itemClicked(food)">
+        <md-card layout-fill layout="column" layout-align="start start"
+                 ng-class="{'md-whiteframe-z3': selectedItem == food.id}">
+          <div ng-class="{'status': true,
+                         'expire-3': getDaysToExpiry(food) <= 1,
+                         'expire-2': getDaysToExpiry(food) > 1 && getDaysToExpiry(food) < 3,
+                         'expire-1': getDaysToExpiry(food) >= 3,
+                         'frozen': getIsFrozen(food)}"
+               flex="33" layout="row" layout-padding layout-align="start start" layout-fill>
+            <div style="min-width: 48px; margin-right: 15px" layout-padding>
+              <md-icon md-font-set="material-icons" class="md-light md-48"
+                       ng-show="getDaysToExpiry(food) <= 1">
+                error_outline
+              </md-icon>
+              <md-icon md-font-set="material-icons" class="md-light md-48"
+                       ng-show="getDaysToExpiry(food) > 1 && getDaysToExpiry(food) < 3">
+                warning
+              </md-icon>
+              <md-icon md-font-set="material-icons" class="md-light md-48"
+                       ng-show="getDaysToExpiry(food) >= 3">
+                access_time
+              </md-icon>
+            </div>
+            <div class="expire-time">
+              {{getDaysToExpiry(food)}} Days
+            </div>
+          </div>
+          <md-card-content layout-padding flex layout-fill>
+            <h2>{{food.name}}</h2>
+            <p>Expires {{getExpirationDate(food)}}</p>
+            <p>Added {{getAge(food)}} days ago</p>
+          </md-card-content>
+          <div layout="row" layout-align="end center" class="md-actions actions-bottom"
+               layout-fill>
+            <md-button ng-click="itemRemoved(food)">
+              Trash
+            </md-button>
+            <md-button class="md-primary" ng-click="itemConsumed(food)">
+              Eat
+            </md-button>
+          </div>
+          
+          <!-- <div class="card-back" ng-show="selectedItem == food.id"> -->
+          <!--   <md-button class="cancel">Cancel</md-button> -->
+          <!--   <div class="right two-thirds"> -->
+          <!--     <div class="left half-width"> -->
+          <!--       <md-button class="card-button half-height top" ng-click="itemFrozen(food)" ng-if="!getIsFrozen(food)"> -->
+          <!--         Freeze -->
+          <!--       </md-button> -->
+          <!--       <md-button class="card-button half-height top" ng-click="itemThawed(food)" ng-if="getIsFrozen(food)"> -->
+          <!--         Thaw -->
+          <!--       </md-button> -->
+          <!--     </div> -->
+          <!--   </div> -->
+          <!-- </div> -->
+        </md-card>
+      </md-grid-tile>
+    </md-grid-list>
+    
+  </md-content>
+  <md-button class="md-primary md-fab md-fab-bottom-right md-accent fixed"
+             ng-click="addFood()">
+    <md-icon class="material-icons md-light">add</md-icon>
+  </md-button>
 </div>

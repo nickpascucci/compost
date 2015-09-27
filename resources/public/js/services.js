@@ -4,7 +4,7 @@ compostServices.factory('UserFoods', function($resource) {
     return $resource('api/v1/people/me/foods/:id', {id: '@id'});
 });
 
-compostServices.factory("authService", function($location, $rootScope) {    
+compostServices.factory("authService", function($location, $rootScope) {
     var service = {
         user: JSON.parse(sessionStorage.getItem('user')),
         auth_info: JSON.parse(sessionStorage.getItem('auth_info')),
