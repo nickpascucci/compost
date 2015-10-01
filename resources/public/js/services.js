@@ -28,7 +28,9 @@ compostServices.factory("authService", function($location, $rootScope) {
             }
         },
         logOut: function () {
-            gapi.auth.signOut();
+            if (gapi.auth != undefined) {
+                gapi.auth.signOut();
+            }
             sessionStorage.removeItem('user');
             sessionStorage.removeItem('auth_info');
             service.user = null;
