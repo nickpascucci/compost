@@ -49,29 +49,15 @@
             <p>Expires {{getExpirationDate(food)}}</p>
             <p>Added {{getAge(food)}} days ago</p>
           </md-card-content>
-          <div layout="row" layout-align="end center" class="md-actions actions-bottom"
+          <div layout="row" layout-align="start center" class="md-actions actions-bottom"
                layout-fill>
-            <md-button ng-click="itemRemoved(food)">
-              Trash
-            </md-button>
             <md-button class="md-primary" ng-click="itemConsumed(food)">
               Eat
             </md-button>
+            <md-button ng-click="itemRemoved(food)">
+              Trash
+            </md-button>
           </div>
-          
-          <!-- <div class="card-back" ng-show="selectedItem == food.id"> -->
-          <!--   <md-button class="cancel">Cancel</md-button> -->
-          <!--   <div class="right two-thirds"> -->
-          <!--     <div class="left half-width"> -->
-          <!--       <md-button class="card-button half-height top" ng-click="itemFrozen(food)" ng-if="!getIsFrozen(food)"> -->
-          <!--         Freeze -->
-          <!--       </md-button> -->
-          <!--       <md-button class="card-button half-height top" ng-click="itemThawed(food)" ng-if="getIsFrozen(food)"> -->
-          <!--         Thaw -->
-          <!--       </md-button> -->
-          <!--     </div> -->
-          <!--   </div> -->
-          <!-- </div> -->
         </md-card>
       </md-grid-tile>
     </md-grid-list>
