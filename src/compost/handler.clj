@@ -6,6 +6,7 @@
    [compojure.handler :as handler]
    [compojure.route :as route]
    [compost.auth :as auth]
+   [compost.database :as db]
    [compost.resources :as r :refer [defresource]]
    [environ.core :refer [env]]
    [liberator.core :as lb]
@@ -47,7 +48,8 @@
   :allowed-methods [:post :get]
   :exists? (fn [ctx]
              (let [auth (friend/current-authentication (:request ctx))]
-               (when-let [user (first (mc/find-maps "users" {:email (:identity auth)}))]
+               (when-let [user (first (mc/find-maps (db/get-database)
+                                                    "users" {:email (:identity auth)}))]
                  {::data (sanitize-db-object user)
                   ::id (:identity auth)})))
   :handle-ok ::data
@@ -59,7 +61,7 @@
              ;; TODO Replace this with malformed? decision point
              (assert (= (:identity auth) (:email user)))
              {::data (sanitize-db-object
-                      (mc/insert-and-return "users" user))}))
+                      (mc/insert-and-return (db/get-database) "users" user))}))
   :post-redirect? (fn [ctx]
                     {:location (format "/api/v1/people/me")}))
 
@@ -69,13 +71,14 @@
   :allowed-methods [:post :get]
   :handle-ok (fn [ctx]
                (let [auth (friend/current-authentication (:request ctx))]
-                 (map sanitize-db-object (mc/find-maps "foods" {:owner (:identity auth)}))))
+                 (map sanitize-db-object
+                      (mc/find-maps (db/get-database) "foods" {:owner (:identity auth)}))))
   :post! (fn [ctx]
            (let [food (s/validate
                        Food
                        (sanitize-input (get-in ctx [:request :body])))]
              {::data (sanitize-db-object
-                      (mc/insert-and-return "foods" food))}))
+                      (mc/insert-and-return (db/get-database) "foods" food))}))
   :post-redirect? (fn [ctx]
                     {:location
                      (format "/api/v1/people/me/foods/%s" (:id (::data ctx)))}))
@@ -86,19 +89,19 @@
   :allowed-methods [:get :delete :post]
   :exists? (fn [_]
              (println "Looking up food" food-id)
-             (when-let [d (mc/find-map-by-id "foods" (ObjectId. food-id))]
+             (when-let [d (mc/find-map-by-id (db/get-database) "foods" (ObjectId. food-id))]
                {::data (sanitize-db-object d)
                 ::id food-id}))
   :post! (fn [ctx]
            (let [food (s/validate
                        Food
                        (sanitize-input (get-in ctx [:request :body])))]
-             (mc/update-by-id "foods" (:_id food) food)
+             (mc/update-by-id (db/get-database) "foods" (:_id food) food)
              {::data (sanitize-db-object food)}))
   :post-redirect? (fn [ctx]
                     {:location
                      (format "/api/v1/people/me/foods/%s" (:id (::data ctx)))})
-  :delete! (fn [ctx] (mc/remove-by-id "foods" (ObjectId. food-id)))
+  :delete! (fn [ctx] (mc/remove-by-id (db/get-database) "foods" (ObjectId. food-id)))
   :handle-ok ::data)
 
 (defresource food-search-resource
@@ -110,8 +113,8 @@
                      auth (friend/current-authentication (:request ctx))]
                  (if-let [query (get params "q")]
                    (map sanitize-db-object
-                        (mc/find-maps "foods" {:name {$regex (str ".*" query ".*")}
-                                               :owner (:identity auth)}))))))
+                        (mc/find-maps (db/get-database) "foods" {:name {$regex (str ".*" query ".*")}
+                                                                :owner (:identity auth)}))))))
 
 (defroutes app-routes
   (ANY "/api/v1/people/me" [] user-resource)

@@ -3,6 +3,7 @@
             [compojure.handler :refer [site]]
             [compojure.route :as route]
             [clojure.java.io :as io]
+            [compost.database :as database]
             [compost.handler :as handler]
             [ring.middleware.stacktrace :as trace]
             [ring.middleware.session :as session]
@@ -28,8 +29,9 @@
 
 (defn init-db! [db-uri]
   (when (not (:db-up? @server-handle))
-    (mg/connect-via-uri db-uri)
-    (swap! server-handle assoc :db-up? true)))
+    (let [{:keys [conn db]} (mg/connect-via-uri db-uri)]
+      (swap! server-handle assoc :db-up? true)
+      (reset! database/connection {:conn conn :db db}))))
 
 (defn start-server! [port]
   (println "Running server on port" port)
