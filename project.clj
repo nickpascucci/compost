@@ -4,7 +4,7 @@
   :license {:name "Confidential and Proprietary" :url "http://www.nickpascucci.com"}
   :dependencies [
                  [com.cemerick/friend "0.2.1"]
-                 [com.novemberain/monger "1.7.0"]
+                 [com.novemberain/monger "3.0.1"]
                  [compojure "1.1.6"]
                  [environ "0.2.1"]
                  [http-kit "2.1.16"]

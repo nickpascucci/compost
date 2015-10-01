@@ -28,7 +28,7 @@
 
 (defn init-db! [db-uri]
   (when (not (:db-up? @server-handle))
-    (mg/connect-via-uri! db-uri)
+    (mg/connect-via-uri db-uri)
     (swap! server-handle assoc :db-up? true)))
 
 (defn start-server! [port]
@@ -55,6 +55,7 @@
 (defn -main [& [port db-uri]]
   (let [port (Integer. (or port (env :port) 5000))
         db-uri (or db-uri (env :mongolab-uri) "mongodb://127.0.0.1/compost")]
+    (println "Connecting to MongoDB at " db-uri)
     (init-db! db-uri)
     (start-server! port)))
 
