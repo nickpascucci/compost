@@ -25,7 +25,7 @@
                          'expire-2': getDaysToExpiry(food) > 1 && getDaysToExpiry(food) < 3,
                          'expire-1': getDaysToExpiry(food) >= 3,
                          'frozen': getIsFrozen(food)}"
-               flex="33" layout="row" layout-padding layout-align="start start" layout-fill>
+               layout="row" layout-padding layout-align="start start" layout-fill>
             <div style="min-width: 48px; margin-right: 15px" layout-padding>
               <md-icon md-font-set="material-icons" class="md-light md-48"
                        ng-show="getDaysToExpiry(food) <= 1">
