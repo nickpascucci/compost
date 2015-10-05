@@ -45,7 +45,15 @@
             </div>
           </div>
           <md-card-content layout-padding flex layout-fill>
-            <h2>{{food.name}}</h2>
+            <div layout="row">
+              <h2>{{food.name}}</h2>
+              <span flex> </span>
+              <md-button class="md-icon-button" ng-click="edit(food)">
+                <md-icon class="material-icons md-dark">
+                  mode_edit
+                </md-icon>
+              </md-button>
+            </div>
             <p>Expires {{getExpirationDate(food)}}</p>
             <p>Added {{getAge(food)}} days ago</p>
           </md-card-content>
@@ -56,9 +64,6 @@
             </md-button>
             <md-button ng-click="itemRemoved(food)">
               Trash
-            </md-button>
-            <md-button ng-click="edit(food)">
-              Edit
             </md-button>
           </div>
         </md-card>

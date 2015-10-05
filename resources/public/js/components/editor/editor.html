@@ -15,6 +15,10 @@
              ng-change="editorCtrl.onDaysToExpiryChanged()"
              type="number" step="any"/>
     </md-input-container>    
+    <md-switch ng-model="editorCtrl.food['frozen?']"
+               ng-change="editorCtrl.onFrozenStatusChanged()">
+      Frozen
+    </md-switch>
     <div class="md-actions">
       <md-button ng-click="editorCtrl.cancel()">Cancel</md-button>
       <md-button ng-click="editorCtrl.done()">Done</md-button>

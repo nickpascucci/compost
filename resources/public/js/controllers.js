@@ -101,21 +101,6 @@ compostControllers.controller(
             food.$save();
         };
 
-        $scope.itemFrozen = function (food) {
-            food["frozen?"] = true;
-            var now = moment().startOf("day");
-            food["thaw-ttl-days"] = moment(food["expires"]).diff(now, "days");
-            food["expires"] = momentToIsoString(now.clone().add("days", FREEZING_EXTENSION));
-            food.$save();
-        };
-
-        $scope.itemThawed = function (food) {
-            food["frozen?"] = false;
-            var now = moment().startOf("day");
-            food["expires"] = momentToIsoString(now.clone().add("days", food["thaw-ttl-days"]));
-            food.$save();
-        };
-
         $scope.edit = function (food) {
             editorService.edit(food)
                 .then(function(food) {
@@ -150,61 +135,13 @@ compostControllers.controller(
                 return "on " + food.expires;
             }
         }
-    });
-
-/*
-  Controller for the add view.
-*/
-compostControllers.controller("AddFoodCtrl", function ($scope, $location, authService, UserFoods) {
-    authService.checkLogIn();
-    $scope.now = moment().startOf("day");
-    $scope.daysToExpiry = 0;
-    $scope.showDays = true;
-    $scope.food = {
-        "name": "New Food",
-        "created": momentToIsoString(moment().startOf("day")),
-        "expires": momentToIsoString($scope.now.clone().add("days", $scope.daysToExpiry)),
-        "owner": authService.getUserEmail(),
-        "status": "active",
-        "frozen?": false,
-    };
-
-    // When the "Save" button is clicked, add the food to our list.
-    $scope.save = function () {
-        UserFoods.save($scope.food, function () {
-            console.log("Saved food ", $scope.food);
-        });
-
-        $location.path("/foods");
-    };
-
-    $scope.cancel = function () {
-        $location.path("/foods");
-    };
-
-    $scope.onDaysToExpiryChanged = function () {
-        $scope.food["expires"] = momentToIsoString(
-            $scope.now.clone().add('days', $scope.daysToExpiry));
     }
-
-    $scope.onDateChanged = function () {
-        $scope.daysToExpiry = getDaysUntil($scope.now, momentFromIsoString($scope.food.expires));
-    }
-
-    $scope.toggleDateFormat = function () {
-        $scope.showDays = !$scope.showDays;
-    }
-});
-
-function momentToIsoString(m) {
-    return m.format("YYYY-MM-DD");
-}
+);
 
 function momentFromIsoString(s) {
     return moment(s);
 }
 
-var millisPerDay = (24 * 60 * 60 * 1000);
 function getDaysUntil(begin, end) {
     return end.diff(begin, "days");
 }
