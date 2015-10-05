@@ -23,6 +23,7 @@
            :expires (s/named String "The ISO date that this food expires on")
            :owner (s/named String "The owner of this food")
            :status (s/named String "The current status - active, eaten, trashed")
+           (s/optional-key :quantity) (s/named Number "How many items there are")
            (s/optional-key :frozen?) (s/named Boolean "Whether this food is frozen")
            (s/optional-key :thaw-ttl-days)
            (s/named Number "How long this food will last when thawed, in days")})

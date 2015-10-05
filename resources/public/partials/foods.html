@@ -46,7 +46,7 @@
           </div>
           <md-card-content layout-padding flex layout-fill>
             <div layout="row">
-              <h2>{{food.name}}</h2>
+              <h2>{{food.name}} <span ng-show="food['quantity']">({{food['quantity']}})</span></h2>
               <span flex> </span>
               <md-button class="md-icon-button" ng-click="edit(food)">
                 <md-icon class="material-icons md-dark">
@@ -60,7 +60,7 @@
           <div layout="row" layout-align="start center" class="md-actions actions-bottom"
                layout-fill>
             <md-button class="md-primary" ng-click="itemConsumed(food)">
-              Eat
+              Eat <span ng-if="food['quantity'] > 1">One</span>
             </md-button>
             <md-button ng-click="itemRemoved(food)">
               Trash

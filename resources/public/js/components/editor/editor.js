@@ -59,6 +59,7 @@ editorModule.factory("editorService", function($rootScope, $mdDialog, authServic
                 "created": momentToIsoString(now),
                 "expires": momentToIsoString(now),
                 "owner": authService.getUserEmail(),
+                "quantity": 1,
                 "status": "active",
                 "frozen?": false,
             };

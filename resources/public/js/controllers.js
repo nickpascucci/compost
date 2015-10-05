@@ -91,7 +91,11 @@ compostControllers.controller(
 
         // When the "Remove" button is clicked, remove the element.
         $scope.itemConsumed = function (food) {
-            food["status"] = "eaten";
+            console.log("Consumed one unit of", food);
+            food["quantity"]--;
+            if (food["quantity"] == 0) {
+                food["status"] = "eaten";
+            }
             food.$save();
         };
 
