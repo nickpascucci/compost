@@ -116,6 +116,14 @@ compostControllers.controller(
             food.$save();
         };
 
+        $scope.edit = function (food) {
+            editorService.edit(food)
+                .then(function(food) {
+                    console.log("Done editing", food);
+                    food.$save();
+                }.bind(this));
+        };
+
         $scope.showNotes = function (food) {
             // TODO Handle showing notes
         };

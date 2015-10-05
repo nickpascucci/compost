@@ -3,9 +3,9 @@ var editorModule = angular.module("editorModule", [
 ]);
 
 editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
-    this.food = food;
-    this.daysToExpiry = 0;
     this.now = moment().startOf("day");
+    this.food = food;
+    this.daysToExpiry = moment(food['expires']).diff(this.now, 'days');
     this.cancel = function() {
         $mdDialog.cancel();
     };
