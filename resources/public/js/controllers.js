@@ -9,17 +9,13 @@ var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
 compostControllers.controller("AuthCtrl", function($scope, authService) {
     $scope.immediateFailed = true;
     $scope.signIn = function(authResult) {
-        $scope.$apply(function() {
-            $scope.processAuth(authResult);
-        });
+        $scope.processAuth(authResult);
     }
 
     $scope.processAuth = function(authResult) {
         $scope.immediateFailed = true;
-        if ($scope.isSignedIn) {
-            return 0;
-        }
-        if (authResult['access_token']) {
+        if (authResult['status']['signed_in']
+            && authResult.status.method !== "AUTO") {
             $scope.immediateFailed = false;
             // Successfully authorized, create session
             authService.onSuccessfulLogin(authResult);
@@ -27,7 +23,7 @@ compostControllers.controller("AuthCtrl", function($scope, authService) {
             if (authResult['error'] == 'immediate_failed') {
                 $scope.immediateFailed = true;
             } else {
-                console.log('Error:' + authResult['error']);
+                console.log('Authentication Error:' + authResult['error']);
             }
         }
     }

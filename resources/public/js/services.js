@@ -9,8 +9,7 @@ compostServices.factory("authService", function($location, $rootScope) {
         user: JSON.parse(sessionStorage.getItem('user')),
         auth_info: JSON.parse(sessionStorage.getItem('auth_info')),
         logIn: function () {
-            service.user = JSON.parse(sessionStorage.getItem('user'));
-            service.auth_info = JSON.parse(sessionStorage.getItem('auth_info'));
+            service.loadStoredCreds();
             if (service.user && service.auth_info) {
                 console.log("User is already logged in.");
                 $location.path("/foods");
@@ -30,6 +29,8 @@ compostServices.factory("authService", function($location, $rootScope) {
         logOut: function () {
             if (gapi.auth != undefined) {
                 gapi.auth.signOut();
+            } else {
+                console.err("gapi.auth is not defined");
             }
             sessionStorage.removeItem('user');
             sessionStorage.removeItem('auth_info');
@@ -53,9 +54,16 @@ compostServices.factory("authService", function($location, $rootScope) {
             return false;
         },
         checkLogIn: function() {
-            if (!service.getUser()) {
+            service.loadStoredCreds();
+            if (!service.getUser() || !service.getToken()) {
                 console.log("User is not logged in, redirecting to login page.");
                 $location.path("/login");
+            }
+        },
+        loadStoredCreds: function() {
+            if (!service.getUser() || !service.getToken()) {
+                service.user = JSON.parse(sessionStorage.getItem('user'));
+                service.auth_info = JSON.parse(sessionStorage.getItem('auth_info'));
             }
         },
         onEmailResponse: function (result) {
@@ -73,7 +81,7 @@ compostServices.factory("authService", function($location, $rootScope) {
             console.log('Auth Result:', result);
             if (result['status']['signed_in']) {
                 gapi.client.load('plus', 'v1', service.onApiClientLoaded);
-                service.auth_info = result;
+                service.auth_info = {'id_token': result['id_token']};
                 sessionStorage.setItem('auth_info', JSON.stringify(result));
             } else {
                 // Update the app to reflect a signed out user
