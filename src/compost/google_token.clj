@@ -15,7 +15,6 @@
 
 (defn validate [token]
   "Verify the JWT token using Google client libraries."
-  (println "Checking token for validity: " (pr-str token))
   (when-let [idToken (.verify token-verifier token)]
     (reduce (fn [m e] (assoc m (keyword (.getKey e)) (.getValue e)))
             {}

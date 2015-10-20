@@ -23,7 +23,7 @@ compostControllers.controller("AuthCtrl", function($scope, authService) {
             if (authResult['error'] == 'immediate_failed') {
                 $scope.immediateFailed = true;
             } else {
-                console.log('Authentication Error:' + authResult['error']);
+                console.log('Authentication Error:', authResult['error']);
             }
         }
     }

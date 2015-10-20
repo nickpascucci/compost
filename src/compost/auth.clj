@@ -12,33 +12,37 @@
   (if-let [decoded-token (tkn/validate token)]
     (do
       (println "Decoded token:" (pr-str decoded-token))
-      {:identity (:email decoded-token) :roles [] :token decoded-token})
+      {:identity (:email decoded-token) :roles [] :decoded-token decoded-token :token token})
     (do
       (println "Token failed to verify!")
       nil)))
 
 (defn google-oauth [& {:keys [credential-fn] :as oauth-config}]
   "Friend workflow for using Google OAuth."
-  (fn [{{:strs [authorization]} :headers :as request}]
-    (when (and authorization (re-matches #"\s*Bearer\s*(.+)" authorization))
-      (if-let [[_ token]
-               (try (re-matches #"\s*Bearer\s+(.+)" authorization)
-                    (catch Exception e
-                      (println "Invalid Authorization header for OAuth: " authorization)
-                      (.printStackTrace e)))]
-        (let [user-record ((util/gets :credential-fn oauth-config (::friend/auth-config request))
-                           :token token)]
+  (fn [{{:strs [authorization]} :headers
+       {query-token "auth"} :query-params
+       :as request}]
+    (when (or authorization
+              query-token)
+      (if-let [request-token
+               (or (try (second (re-matches #"\s*Bearer\s+(.+)" authorization))
+                        (catch Exception e
+                          (.printStackTrace e)))
+                   query-token)]
+        (do
+          (let [user-record ((util/gets :credential-fn oauth-config (::friend/auth-config request))
+                             :token request-token)]
             (if-let [identity (:identity user-record)]
-             (do
-               (println "Authorization succeeded, user:" identity)
-               (with-meta user-record
-                 {::friend/workflow :google-oauth
-                  ::friend/redirect-on-auth? false
-                  ::friend/ensure-session false
-                  :type ::friend/auth}))
-           (do
-             (println "Authorization failed!")
-             {:status 401 :body (str "Authorization failed: " authorization)})))
+              (do
+                (println "Authorization succeeded, user:" identity)
+                (with-meta user-record
+                  {::friend/workflow :google-oauth
+                   ::friend/redirect-on-auth? false
+                   ::friend/ensure-session false
+                   :type ::friend/auth}))
+              (do
+                (println "Authorization failed!")
+                {:status 401 :body (str "Authorization failed: " authorization)}))))
         (do
           (println "Authorization failed!")
           {:status 400 :body "Malformed Authorization header for OAuth authentication."})))))

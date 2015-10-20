@@ -64,7 +64,9 @@
              {::data (sanitize-db-object
                       (mc/insert-and-return (db/get-database) "users" user))}))
   :post-redirect? (fn [ctx]
-                    {:location (format "/api/v1/people/me")}))
+                    {:location
+                     (let [auth (friend/current-authentication (:request ctx))]
+                       (format "/api/v1/people/me?auth=%s" (:token auth)))}))
 
 (defresource user-foods-resource
   :base r/authenticated-base
@@ -82,14 +84,16 @@
                       (mc/insert-and-return (db/get-database) "foods" food))}))
   :post-redirect? (fn [ctx]
                     {:location
-                     (format "/api/v1/people/me/foods/%s" (:id (::data ctx)))}))
+                     (let [auth (friend/current-authentication (:request ctx))]
+                       (format "/api/v1/people/me/foods/%s?auth=%s"
+                               (:id (::data ctx))
+                               (:token auth)))}))
 
 (defresource food-resource [food-id]
   :base r/authenticated-base
   :available-media-types ["application/json"]
   :allowed-methods [:get :delete :post]
   :exists? (fn [_]
-             (println "Looking up food" food-id)
              (when-let [d (mc/find-map-by-id (db/get-database) "foods" (ObjectId. food-id))]
                {::data (sanitize-db-object d)
                 ::id food-id}))
@@ -101,7 +105,10 @@
              {::data (sanitize-db-object food)}))
   :post-redirect? (fn [ctx]
                     {:location
-                     (format "/api/v1/people/me/foods/%s" (:id (::data ctx)))})
+                     (let [auth (friend/current-authentication (:request ctx))]
+                       (format "/api/v1/people/me/foods/%s?auth=%s"
+                               (:id (::data ctx))
+                               (:token auth)))})
   :delete! (fn [ctx] (mc/remove-by-id (db/get-database) "foods" (ObjectId. food-id)))
   :handle-ok ::data)
 
@@ -114,8 +121,9 @@
                      auth (friend/current-authentication (:request ctx))]
                  (if-let [query (get params "q")]
                    (map sanitize-db-object
-                        (mc/find-maps (db/get-database) "foods" {:name {$regex (str ".*" query ".*")}
-                                                                :owner (:identity auth)}))))))
+                        (mc/find-maps (db/get-database) "foods"
+                                      {:name {$regex (str ".*" query ".*")}
+                                       :owner (:identity auth)}))))))
 
 (defroutes app-routes
   (ANY "/api/v1/people/me" [] user-resource)
