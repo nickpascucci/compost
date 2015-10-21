@@ -18,8 +18,7 @@
       <md-grid-tile md-rowspan="1" md-colspan="1"
                     ng-repeat="food in getActiveFoods(foods) | orderBy : getDaysToExpiry"
                     ng-click="itemClicked(food)">
-        <md-card layout-fill layout="column" layout-align="start start"
-                 ng-class="{'md-whiteframe-z3': selectedItem == food.id}">
+        <md-card layout-fill layout="column" layout-align="start start">
           <div ng-class="{'status': true,
                          'expire-3': getDaysToExpiry(food) <= 1,
                          'expire-2': getDaysToExpiry(food) > 1 && getDaysToExpiry(food) < 3,

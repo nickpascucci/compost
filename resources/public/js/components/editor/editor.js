@@ -71,6 +71,7 @@ editorModule.factory("editorService", function($rootScope, $mdDialog, authServic
                 templateUrl: "js/components/editor/editor.html",
                 controller: "EditorCtrl",
                 controllerAs: "editorCtrl",
+                parent: angular.element(document.body),
                 locals: {
                     food: food
                 }

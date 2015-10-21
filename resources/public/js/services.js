@@ -34,7 +34,7 @@ AuthService.prototype.logOut = function () {
     if (gapi.auth != undefined) {
         gapi.auth.signOut();
     } else {
-        console.err('gapi.auth is not defined');
+        console.error('gapi.auth is not defined');
     }
     sessionStorage.removeItem('user');
     sessionStorage.removeItem('auth_info');
