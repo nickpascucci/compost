@@ -1,6 +1,5 @@
 /.lein-env
 /.nrepl-port
-/resources/public/js/compost.js
 
 target/
 
