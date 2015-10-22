@@ -93,9 +93,9 @@ AuthService.prototype.onApiClientLoaded = function () {
 
 AuthService.prototype.onSuccessfulLogin = function (result) {
     console.log('Auth Result:', result);
-    if (result['status']['signed_in']) {
+    if (result.status.signed_in) {
         gapi.client.load('plus', 'v1', this.onApiClientLoaded.bind(this));
-        this.auth_info = {'id_token': result['id_token']};
+        this.auth_info = {'id_token': result.id_token};
         sessionStorage.setItem('auth_info', JSON.stringify(result));
     } else {
         // Update the app to reflect a signed out user
@@ -103,7 +103,7 @@ AuthService.prototype.onSuccessfulLogin = function (result) {
         //   'user_signed_out' - User is signned-out
         //   'access_denied' - User denied access to your app
         //   'immediate_failed' - Could not automatically log in the user
-        console.log('Sign-in state: ' + result['error']);
+        console.log('Sign-in state: ' + result.error);
         this.logOut();
     }
 };
@@ -119,7 +119,7 @@ compostServices.factory('authInterceptor', function($q, authService) {
         request: function(config) {
             var token = authService.getToken();
             if (token !== undefined) {
-                config.headers['Authorization'] = 'Bearer ' + token;
+                config.headers.Authorization = 'Bearer ' + token;
                 console.log('Making authenticated request:', config);
             } else {
                 console.log('Making unauthenticated request:', config);

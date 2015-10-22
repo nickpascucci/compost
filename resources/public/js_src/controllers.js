@@ -14,16 +14,16 @@ compostControllers.controller("AuthCtrl", function($scope, authService) {
 
     $scope.processAuth = function(authResult) {
         $scope.immediateFailed = true;
-        if (authResult['status']['signed_in'] &&
+        if (authResult.status.signed_in &&
             authResult.status.method !== "AUTO") {
             $scope.immediateFailed = false;
             // Successfully authorized, create session
             authService.onSuccessfulLogin(authResult);
-        } else if (authResult['error']) {
-            if (authResult['error'] == 'immediate_failed') {
+        } else if (authResult.error) {
+            if (authResult.error == 'immediate_failed') {
                 $scope.immediateFailed = true;
             } else {
-                console.log('Authentication Error:', authResult['error']);
+                console.log('Authentication Error:', authResult.error);
             }
         }
     };
@@ -59,7 +59,7 @@ compostControllers.controller(
 
         $scope.getActiveFoods = function (foods) {
             return foods.filter(function(e, i, a) {
-                return e["status"] === "active";
+                return e.status === "active";
             });
         };
 
@@ -74,7 +74,7 @@ compostControllers.controller(
                         this.foods.push(food);
                     }.bind(this));
                 }.bind(this));
-        }
+        };
 
         // When an item is clicked, switch sides.
         $scope.itemClicked = function (food) {
@@ -88,16 +88,16 @@ compostControllers.controller(
         // When the "Remove" button is clicked, remove the element.
         $scope.itemConsumed = function (food) {
             console.log("Consumed one unit of", food);
-            food["quantity"]--;
-            if (food["quantity"] === 0) {
-                food["status"] = "eaten";
+            food.quantity--;
+            if (food.quantity === 0) {
+                food.status = "eaten";
             }
             food.$save();
         };
 
         // TODO: Count a "consumed" removal separately from a "trashed" removal
         $scope.itemRemoved = function (food) {
-            food["status"] = "trashed";
+            food.status = "trashed";
             food.$save();
         };
 
