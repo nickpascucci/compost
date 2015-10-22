@@ -9,7 +9,7 @@ function AuthService($location, $rootScope) {
     this.rootScope_ = $rootScope;
     this.user = JSON.parse(sessionStorage.getItem('user'));
     this.auth_info = JSON.parse(sessionStorage.getItem('auth_info'));
-};
+}
 
 AuthService.prototype.logIn = function () {
     this.loadStoredCreds();
@@ -18,7 +18,7 @@ AuthService.prototype.logIn = function () {
         this.location_.path('/foods');
         return;
     }
-    if (gapi.auth != undefined) {
+    if (gapi.auth !== undefined) {
         var additionalParams = {
             'callback': this.onSuccessfulLogin,
             'cookiepolicy': 'single_host_origin',
@@ -31,7 +31,7 @@ AuthService.prototype.logIn = function () {
 };
 
 AuthService.prototype.logOut = function () {
-    if (gapi.auth != undefined) {
+    if (gapi.auth !== undefined) {
         gapi.auth.signOut();
     } else {
         console.error('gapi.auth is not defined');
@@ -55,7 +55,7 @@ AuthService.prototype.getUserEmail = function() {
 };
 
 AuthService.prototype.isLoggedIn = function() {
-    if (this.getUser() != undefined) {
+    if (this.getUser() !== undefined) {
         return true;
     }
     return false;
@@ -83,7 +83,7 @@ AuthService.prototype.onEmailResponse = function (result) {
     // TODO Redirect to the path where we came from
     this.location_.path('/foods');
     this.rootScope_.$apply();
-}
+};
 
 AuthService.prototype.onApiClientLoaded = function () {
     console.log('API loaded');
@@ -118,7 +118,7 @@ compostServices.factory('authInterceptor', function($q, authService) {
     return {
         request: function(config) {
             var token = authService.getToken();
-            if (token != undefined) {
+            if (token !== undefined) {
                 config.headers['Authorization'] = 'Bearer ' + token;
                 console.log('Making authenticated request:', config);
             } else {

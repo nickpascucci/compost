@@ -10,12 +10,12 @@ compostControllers.controller("AuthCtrl", function($scope, authService) {
     $scope.immediateFailed = true;
     $scope.signIn = function(authResult) {
         $scope.processAuth(authResult);
-    }
+    };
 
     $scope.processAuth = function(authResult) {
         $scope.immediateFailed = true;
-        if (authResult['status']['signed_in']
-            && authResult.status.method !== "AUTO") {
+        if (authResult['status']['signed_in'] &&
+            authResult.status.method !== "AUTO") {
             $scope.immediateFailed = false;
             // Successfully authorized, create session
             authService.onSuccessfulLogin(authResult);
@@ -26,7 +26,7 @@ compostControllers.controller("AuthCtrl", function($scope, authService) {
                 console.log('Authentication Error:', authResult['error']);
             }
         }
-    }
+    };
 
     $scope.renderSignIn = function() {
         gapi.signin.render('gsignin', {
@@ -37,12 +37,12 @@ compostControllers.controller("AuthCtrl", function($scope, authService) {
             'theme': 'dark',
             'width': 'wide',
         });
-    }
+    };
 
     $scope.logOut = function () {
         $scope.immediateFailed = true;
         authService.logOut();
-    }
+    };
 
     $scope.renderSignIn();
 });
@@ -89,7 +89,7 @@ compostControllers.controller(
         $scope.itemConsumed = function (food) {
             console.log("Consumed one unit of", food);
             food["quantity"]--;
-            if (food["quantity"] == 0) {
+            if (food["quantity"] === 0) {
                 food["status"] = "eaten";
             }
             food.$save();
@@ -116,25 +116,25 @@ compostControllers.controller(
         $scope.getIsFrozen = function (food) {
             var frozen = false || food["frozen?"];
             return frozen;
-        }
+        };
 
         $scope.getAge = function (food) {
             return getDaysUntil(momentFromIsoString(food.created), moment().startOf("day"));
-        }
+        };
 
         $scope.getDaysToExpiry = function (food) {
             return getDaysUntil(moment().startOf("day"), momentFromIsoString(food.expires));
-        }
+        };
 
         $scope.getExpirationDate = function (food) {
-            if ($scope.getDaysToExpiry(food) == 0) {
+            if ($scope.getDaysToExpiry(food) === 0) {
                 return "today";
             } else if ($scope.getDaysToExpiry(food) == 1) {
                 return "tomorrow";
             } else {
                 return "on " + food.expires;
             }
-        }
+        };
     }
 );
 

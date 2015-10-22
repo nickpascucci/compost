@@ -10,9 +10,9 @@ function momentToIsoString(m) {
 
 editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
     this.copyTo = function(source, dest) {
-        for (property in source) {
-            if (source.hasOwnProperty(property)
-                && property.indexOf('$') < 0) {
+        for (var property in source) {
+            if (source.hasOwnProperty(property) &&
+                property.indexOf('$') < 0) {
                 dest[property] = source[property];
             }
         }
@@ -48,7 +48,7 @@ editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
             console.log("Food thawed", this.food);
         }
     }.bind(this);
-})
+});
 
 editorModule.factory("editorService", function($rootScope, $mdDialog, authService) {
     var service = {
@@ -80,4 +80,4 @@ editorModule.factory("editorService", function($rootScope, $mdDialog, authServic
     };
 
     return service;
-})
+});
