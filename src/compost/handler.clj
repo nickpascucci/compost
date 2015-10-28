@@ -17,6 +17,8 @@
    [schema.core :as s])
   (:import [org.bson.types ObjectId]))
 
+(def dev-mode? (not (env :production)))
+
 (def Food {(s/optional-key :_id) (s/named ObjectId "The ID of this food")
            :name (s/named String "The name of this food")
            :created (s/named String "The ISO date that this food was created on")
@@ -151,5 +153,5 @@
              (wrap-json-response)
              (wrap-json-body {:keywords? true})
              (handler/api)
-             ((fn [r] (if (env :development) r (auth/https-required-middleware r))))
+             ((fn [r] (if dev-mode? r (auth/https-required-middleware r))))
              (logging-middleware)))
