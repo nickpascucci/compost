@@ -12,7 +12,7 @@ module.exports = function(grunt) {
       }
     },
     jshint: {
-      all: ['Gruntfile.js', 'js_src/**/*.js']
+        all: ['Gruntfile.js', '<%= concat.dist.src %>']
     },
     concat: {
       options: {
@@ -21,8 +21,11 @@ module.exports = function(grunt) {
           '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
       },
       dist: {
-        src: ['js_src/**/*.js'],
-        dest: 'js/compost.js',
+          src: ['js_src/services.js',
+                'js_src/controllers.js',
+                'js_src/components/**/*.js',
+                'js_src/app.js'],
+          dest: 'js/compost-min.js',
       },
     },
     watch: {
