@@ -2,7 +2,7 @@ var authModule = angular.module("authModule", [
     "compostServices"
 ]);
 
-compostControllers.controller("AuthCtrl", function($scope, authService) {
+authModule.controller("AuthCtrl", function($scope, authService) {
     $scope.immediateFailed = true;
     $scope.signIn = function(authResult) {
         $scope.processAuth(authResult);

@@ -68,7 +68,7 @@ editorModule.factory("editorService", function($rootScope, $mdDialog, authServic
         edit: function(food) {
             return $mdDialog.show({
                 clickOutsideToClose: true,
-                templateUrl: "js/components/editor/editor.html",
+                templateUrl: "partials/editor.html",
                 controller: "EditorCtrl",
                 controllerAs: "editorCtrl",
                 parent: angular.element(document.body),

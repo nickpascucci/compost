@@ -1,4 +1,4 @@
-var compostControllers = angular.module("compostControllers", [
+var foodListModule = angular.module("foodListModule", [
     "ngMaterial",
     "editorModule",
     "authModule",
@@ -10,7 +10,7 @@ var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
 /*
   Controller for the food list view.
 */
-compostControllers.controller(
+foodListModule.controller(
     "FoodListCtrl", function ($scope, authService, editorService, UserFoods) {
         authService.checkLogIn();
         this.scope_ = $scope;
