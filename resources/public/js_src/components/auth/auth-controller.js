@@ -3,22 +3,17 @@ var authModule = angular.module("authModule", [
 ]);
 
 authModule.controller("AuthCtrl", function($scope, authService) {
-    $scope.immediateFailed = true;
     $scope.signIn = function(authResult) {
         $scope.processAuth(authResult);
     };
 
     $scope.processAuth = function(authResult) {
-        $scope.immediateFailed = true;
         if (authResult.status.signed_in &&
             authResult.status.method !== "AUTO") {
-            $scope.immediateFailed = false;
             // Successfully authorized, create session
             authService.onSuccessfulLogin(authResult);
         } else if (authResult.error) {
-            if (authResult.error == 'immediate_failed') {
-                $scope.immediateFailed = true;
-            } else {
+            if (authResult.error != 'immediate_failed') {
                 console.log('Authentication Error:', authResult.error);
             }
         }
@@ -36,7 +31,6 @@ authModule.controller("AuthCtrl", function($scope, authService) {
     };
 
     $scope.logOut = function () {
-        $scope.immediateFailed = true;
         authService.logOut();
     };
 

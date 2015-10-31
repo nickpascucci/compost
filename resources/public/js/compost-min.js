@@ -18,7 +18,7 @@ AuthService.prototype.logIn = function () {
     this.loadStoredCreds();
     if (this.user && this.auth_info) {
         console.log('User is already logged in.');
-        this.injector_.get('$state').go('foods');
+        this.injector_.get('$state').go('app.foods');
         return;
     }
     if (gapi.auth !== undefined) {
@@ -84,7 +84,7 @@ AuthService.prototype.onEmailResponse = function (result) {
     console.log('Logged in as ', this.user.displayName);
     sessionStorage.setItem('user', JSON.stringify(result));
     // TODO Redirect to the path where we came from
-    this.injector_.get('$state').go('foods');
+    this.injector_.get('$state').go('app.foods');
     this.rootScope_.$apply();
 };
 
@@ -157,22 +157,17 @@ var authModule = angular.module("authModule", [
 ]);
 
 authModule.controller("AuthCtrl", function($scope, authService) {
-    $scope.immediateFailed = true;
     $scope.signIn = function(authResult) {
         $scope.processAuth(authResult);
     };
 
     $scope.processAuth = function(authResult) {
-        $scope.immediateFailed = true;
         if (authResult.status.signed_in &&
             authResult.status.method !== "AUTO") {
-            $scope.immediateFailed = false;
             // Successfully authorized, create session
             authService.onSuccessfulLogin(authResult);
         } else if (authResult.error) {
-            if (authResult.error == 'immediate_failed') {
-                $scope.immediateFailed = true;
-            } else {
+            if (authResult.error != 'immediate_failed') {
                 console.log('Authentication Error:', authResult.error);
             }
         }
@@ -190,7 +185,6 @@ authModule.controller("AuthCtrl", function($scope, authService) {
     };
 
     $scope.logOut = function () {
-        $scope.immediateFailed = true;
         authService.logOut();
     };
 
@@ -405,13 +399,33 @@ compostApp.config([
     function($urlRouterProvider, $stateProvider) {
         $urlRouterProvider.otherwise("/login");
         $stateProvider
-            .state("foods", {
-                url: "/foods",
-                templateUrl: "partials/foods.html",
-                controller: "FoodListCtrl"
-            }).state("login", {
+            .state("app", {
+                url: "/",
+                views: {
+                    'content': {
+                        templateUrl: "partials/app.html",
+                        controller: "AppCtrl"
+                    }
+                }
+            })
+            .state("app.foods", {
+                url: "foods",
+                views: {
+                    'foods': {
+                        templateUrl: "partials/foods.html",
+                        controller: "FoodListCtrl"
+                    }
+                }
+            })
+            .state("login", {
                 url: "/login",
                 templateUrl: "partials/login.html",
                 controller: "AuthCtrl"
             });
     }]);
+
+compostApp.controller("AppCtrl", function($scope, authService) {
+    $scope.logOut = function () {
+        authService.logOut();
+    };
+});
