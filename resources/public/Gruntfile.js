@@ -16,7 +16,7 @@ module.exports = function(grunt) {
     },
     concat: {
       options: {
-        stripBanners: true,
+        stripBanners: false,
         banner: '/*! <%= pkg.name %> - v<%= pkg.version %> - ' +
           '<%= grunt.template.today("yyyy-mm-dd") %> */\n',
       },
@@ -29,9 +29,17 @@ module.exports = function(grunt) {
           dest: 'js/compost-min.js',
       },
     },
+    notify: {
+      success: {
+        options: {
+          title: "Grunt Finished",
+          message: "All tasks completed"
+        }
+      }
+    },
     watch: {
       files: ['<%= jshint.all %>'],
-      tasks: ['jshint', 'concat']
+      tasks: ['jshint', 'concat', 'notify:success']
     }
   });
 
@@ -39,7 +47,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-notify');
 
-  grunt.registerTask('default', ['jshint', 'concat']);
+  grunt.registerTask('default', ['jshint', 'concat', 'notify']);
 
 };

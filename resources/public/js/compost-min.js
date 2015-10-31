@@ -202,8 +202,6 @@ function momentToIsoString(m) {
 }
 
 editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
-    this.useDialog = !isMobile;
-
     this.copyTo = function(source, dest) {
         for (var property in source) {
             if (source.hasOwnProperty(property) &&
@@ -247,6 +245,7 @@ editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
 
 editorModule.factory("editorService", function($rootScope, $mdDialog, authService) {
     var service = {
+        useDialog: !isMobile,
         create: function() {
             var now = moment().startOf("day");
             var food = {
@@ -261,6 +260,9 @@ editorModule.factory("editorService", function($rootScope, $mdDialog, authServic
             return service.edit(food);
         },
         edit: function(food) {
+            return service.editWithDialog(food);
+        },
+        editWithDialog: function(food) {
             return $mdDialog.show({
                 clickOutsideToClose: true,
                 templateUrl: "partials/editor.html",
