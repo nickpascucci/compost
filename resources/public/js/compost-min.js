@@ -1,12 +1,14 @@
-/*! compost-client - v0.0.1-SNAPSHOT - 2015-10-29 */
+/*! compost-client - v0.0.1-SNAPSHOT - 2015-10-31 */
+var isMobile = window.matchMedia("only screen and (max-width: 760px)");
+
 var compostServices = angular.module('compostServices', ['ngResource']);
 
 compostServices.factory('UserFoods', function($resource) {
     return $resource('api/v1/people/me/foods/:id', {id: '@id'});
 });
 
-function AuthService($location, $rootScope) {
-    this.location_ = $location;
+function AuthService($injector, $rootScope) {
+    this.injector_ = $injector;
     this.rootScope_ = $rootScope;
     this.user = JSON.parse(sessionStorage.getItem('user'));
     this.auth_info = JSON.parse(sessionStorage.getItem('auth_info'));
@@ -16,7 +18,7 @@ AuthService.prototype.logIn = function () {
     this.loadStoredCreds();
     if (this.user && this.auth_info) {
         console.log('User is already logged in.');
-        this.location_.path('/foods');
+        this.injector_.get('$state').go('foods');
         return;
     }
     if (gapi.auth !== undefined) {
@@ -42,7 +44,7 @@ AuthService.prototype.logOut = function () {
     this.user = null;
     this.auth_info = null;
     console.log('Logged out');
-    this.location_.path('/login');
+    this.injector_.get('$state').go('login');
 };
 
 AuthService.prototype.getUser = function() {
@@ -66,7 +68,7 @@ AuthService.prototype.checkLogIn = function() {
     this.loadStoredCreds();
     if (!this.getUser() || !this.getToken()) {
         console.log('User is not logged in, redirecting to login page.');
-        this.location_.path('/login');
+        this.injector_.get('$state').go('login');
     }
 };
 
@@ -82,7 +84,7 @@ AuthService.prototype.onEmailResponse = function (result) {
     console.log('Logged in as ', this.user.displayName);
     sessionStorage.setItem('user', JSON.stringify(result));
     // TODO Redirect to the path where we came from
-    this.location_.path('/foods');
+    this.injector_.get('$state').go('foods');
     this.rootScope_.$apply();
 };
 
@@ -206,6 +208,8 @@ function momentToIsoString(m) {
 }
 
 editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
+    this.useDialog = !isMobile;
+    
     this.copyTo = function(source, dest) {
         for (var property in source) {
             if (source.hasOwnProperty(property) &&
@@ -391,25 +395,23 @@ var compostApp = angular.module("compostApp", [
     "ngRoute",
     "ngMaterial",
     "foodListModule",
-    "compostServices"
+    "compostServices",
+    "ui.router"
 ]);
 
 compostApp.config([
-    "$routeProvider",
-    function($routeProvider) {
-        $routeProvider
-            .when("/foods", {
+    "$urlRouterProvider",
+    "$stateProvider",
+    function($urlRouterProvider, $stateProvider) {
+        $urlRouterProvider.otherwise("/login");
+        $stateProvider
+            .state("foods", {
+                url: "/foods",
                 templateUrl: "partials/foods.html",
                 controller: "FoodListCtrl"
-            }).when("/login", {
+            }).state("login", {
+                url: "/login",
                 templateUrl: "partials/login.html",
                 controller: "AuthCtrl"
-            }).otherwise({
-                redirectTo: "/login"
             });
-    }])
-    .run(function($rootScope, $location, authService) {
-        $rootScope.$on("$routeChangeStart", function (event, next, current) {
-            authService.checkLogIn();
-        });
-    });
+    }]);
