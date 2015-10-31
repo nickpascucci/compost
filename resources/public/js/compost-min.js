@@ -308,9 +308,9 @@ foodListModule.controller(
         $scope.addFood = function() {
             editorService.create()
                 .then(function(food) {
-                    console.log("done editing", food);
-                    UserFoods.save(food, function () {
-                        this.foods.push(food);
+                    console.log("Created", food);
+                    UserFoods.save(food, function (saved) {
+                        this.foods.push(saved);
                     }.bind(this));
                 }.bind(this));
         };
@@ -342,9 +342,9 @@ foodListModule.controller(
 
         $scope.edit = function (food) {
             editorService.edit(food)
-                .then(function(food) {
-                    console.log("Done editing", food);
-                    food.$save();
+                .then(function(edited) {
+                    console.log("Done editing", edited);
+                    edited.$save();
                 }.bind(this));
         };
 
