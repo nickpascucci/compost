@@ -95,12 +95,15 @@ md-grid-tile:focus {
     margin-top: 10px;
 }
 
+.centered {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+   transform: translate(-50%, -50%);
+}
+
 .login {
-    width: 200px;
-    margin-left: -100px;
-    position: absolute;
-    left: 50%;
-    top: 30%;
+    text-align: center;
 }
 
 .login-button {
