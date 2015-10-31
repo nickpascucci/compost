@@ -2,25 +2,23 @@ var compostApp = angular.module("compostApp", [
     "ngRoute",
     "ngMaterial",
     "foodListModule",
-    "compostServices"
+    "compostServices",
+    "ui.router"
 ]);
 
 compostApp.config([
-    "$routeProvider",
-    function($routeProvider) {
-        $routeProvider
-            .when("/foods", {
+    "$urlRouterProvider",
+    "$stateProvider",
+    function($urlRouterProvider, $stateProvider) {
+        $urlRouterProvider.otherwise("/login");
+        $stateProvider
+            .state("foods", {
+                url: "/foods",
                 templateUrl: "partials/foods.html",
                 controller: "FoodListCtrl"
-            }).when("/login", {
+            }).state("login", {
+                url: "/login",
                 templateUrl: "partials/login.html",
                 controller: "AuthCtrl"
-            }).otherwise({
-                redirectTo: "/login"
             });
-    }])
-    .run(function($rootScope, $location, authService) {
-        $rootScope.$on("$routeChangeStart", function (event, next, current) {
-            authService.checkLogIn();
-        });
-    });
+    }]);

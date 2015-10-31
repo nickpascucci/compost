@@ -209,7 +209,7 @@ function momentToIsoString(m) {
 
 editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
     this.useDialog = !isMobile;
-    
+
     this.copyTo = function(source, dest) {
         for (var property in source) {
             if (source.hasOwnProperty(property) &&
