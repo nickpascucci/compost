@@ -15,7 +15,7 @@ AuthService.prototype.logIn = function () {
     this.loadStoredCreds();
     if (this.user && this.auth_info) {
         console.log('User is already logged in.');
-        this.injector_.get('$state').go('foods');
+        this.injector_.get('$state').go('app.foods');
         return;
     }
     if (gapi.auth !== undefined) {
@@ -81,7 +81,7 @@ AuthService.prototype.onEmailResponse = function (result) {
     console.log('Logged in as ', this.user.displayName);
     sessionStorage.setItem('user', JSON.stringify(result));
     // TODO Redirect to the path where we came from
-    this.injector_.get('$state').go('foods');
+    this.injector_.get('$state').go('app.foods');
     this.rootScope_.$apply();
 };
 
