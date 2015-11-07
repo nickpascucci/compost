@@ -24,16 +24,30 @@ compostApp.config([
             .state("app.foods", {
                 url: "foods",
                 views: {
-                    'foods': {
+                    'content': {
                         templateUrl: "partials/foods.html",
                         controller: "FoodListCtrl"
                     }
                 }
             })
+            .state("app.foods.edit", {
+                url: "/{foodId}/edit?food",
+                views: {
+                    'content@app': {
+                        templateUrl: "partials/editor-page.html",
+                        controller: "EditorCtrl",
+                        controllerAs: "editorCtrl"
+                    }
+                }
+            })
             .state("login", {
                 url: "/login",
-                templateUrl: "partials/login.html",
-                controller: "AuthCtrl"
+                views: {
+                    'content': {
+                        templateUrl: "partials/login.html",
+                        controller: "AuthCtrl"
+                    }
+                }
             });
     }]);
 

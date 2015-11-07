@@ -1,4 +1,4 @@
-/*! compost-client - v0.0.1-SNAPSHOT - 2015-10-31 */
+/*! compost-client - v0.0.1-SNAPSHOT - 2015-11-06 */
 var isMobile = window.matchMedia("only screen and (max-width: 760px)");
 
 var compostServices = angular.module('compostServices', ['ngResource']);
@@ -201,7 +201,9 @@ function momentToIsoString(m) {
     return m.format("YYYY-MM-DD");
 }
 
-editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
+editorModule.controller("EditorCtrl", function(
+    $scope, $mdDialog, $stateParams, editorService) {
+
     this.copyTo = function(source, dest) {
         for (var property in source) {
             if (source.hasOwnProperty(property) &&
@@ -212,22 +214,27 @@ editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
         return dest;
     };
 
+    console.log("Food:", JSON.parse($stateParams.food));
+    console.log("this.food:", this.food);
+    this.food = this.food ? this.food : JSON.parse($stateParams.food);
+    console.log("this.food:", this.food);
     this.now = moment().startOf("day");
-    this.original = this.copyTo(food, {});
-    this.food = food;
-    this.daysToExpiry = moment(food.expires).diff(this.now, 'days');
+    this.original = this.copyTo(this.food, {});
+    this.daysToExpiry = moment(this.food.expires).diff(this.now, 'days');
+
     this.cancel = function() {
         this.copyTo(this.original, this.food);
-        $mdDialog.cancel();
+        editorService.cancelEdit();
     };
+
     this.done = function() {
-        $mdDialog.hide(this.food);
-    }.bind(this);
+        editorService.finishEdit(this.food);
+    };
 
     this.onDaysToExpiryChanged = function () {
         this.food.expires = momentToIsoString(
             this.now.clone().add('days', this.daysToExpiry));
-    }.bind(this);
+    };
 
     this.onFrozenStatusChanged = function () {
         if (this.food['frozen?']) {
@@ -240,12 +247,14 @@ editorModule.controller("EditorCtrl", function($scope, $mdDialog, food) {
                 this.now.clone().add("days", this.food["thaw-ttl-days"]));
             console.log("Food thawed", this.food);
         }
-    }.bind(this);
+    };
 });
 
-editorModule.factory("editorService", function($rootScope, $mdDialog, authService) {
+editorModule.factory("editorService", function(
+    $rootScope, $q, $state, $mdDialog, authService) {
     var service = {
         useDialog: !isMobile,
+        deferred: undefined,
         create: function() {
             var now = moment().startOf("day");
             var food = {
@@ -260,19 +269,48 @@ editorModule.factory("editorService", function($rootScope, $mdDialog, authServic
             return service.edit(food);
         },
         edit: function(food) {
-            return service.editWithDialog(food);
+            if (service.useDialog) {
+                return service.editWithDialog(food);
+            } else {
+                return service.editWithPage(food);
+            }
         },
         editWithDialog: function(food) {
             return $mdDialog.show({
                 clickOutsideToClose: true,
-                templateUrl: "partials/editor.html",
+                templateUrl: "partials/editor-dialog.html",
                 controller: "EditorCtrl",
                 controllerAs: "editorCtrl",
                 parent: angular.element(document.body),
                 locals: {
                     food: food
-                }
+                },
+                bindToController: true
             });
+        },
+        editWithPage: function(food) {
+            service.deferred = $q.defer();
+            console.log('Transferring to editor page.');
+            $state.go('app.foods.edit', {foodId: food.id,
+                                         food: JSON.stringify(food)});
+            return deferred.promise;
+        },
+        cancelEdit: function() {
+            console.log("Canceled editing");
+            if (service.useDialog) {
+                $state.go('app.foods');
+            } else {
+                $mdDialog.cancel();
+            }
+        },
+        finishEdit: function(food) {
+            if (service.useDialog) {
+                service.deferred.resolve(food);
+                console.log("Done editing:", food);
+                $state.go('app.foods');
+            } else {
+                $mdDialog.hide(food);
+            }
         }
     };
 
@@ -413,16 +451,30 @@ compostApp.config([
             .state("app.foods", {
                 url: "foods",
                 views: {
-                    'foods': {
+                    'content': {
                         templateUrl: "partials/foods.html",
                         controller: "FoodListCtrl"
                     }
                 }
             })
+            .state("app.foods.edit", {
+                url: "/{foodId}/edit?food",
+                views: {
+                    'content@app': {
+                        templateUrl: "partials/editor-page.html",
+                        controller: "EditorCtrl",
+                        controllerAs: "editorCtrl"
+                    }
+                }
+            })
             .state("login", {
                 url: "/login",
-                templateUrl: "partials/login.html",
-                controller: "AuthCtrl"
+                views: {
+                    'content': {
+                        templateUrl: "partials/login.html",
+                        controller: "AuthCtrl"
+                    }
+                }
             });
     }]);
 
