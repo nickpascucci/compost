@@ -24,6 +24,7 @@ module.exports = function(grunt) {
           src: ['js_src/util.js',
                 'js_src/services.js',
                 'js_src/controllers.js',
+                'js_src/components/util/*.js',
                 'js_src/components/**/*.js',
                 'js_src/app.js'],
           dest: 'js/compost-min.js',

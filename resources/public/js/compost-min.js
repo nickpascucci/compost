@@ -1,6 +1,4 @@
-/*! compost-client - v0.0.1-SNAPSHOT - 2015-11-06 */
-var isMobile = window.matchMedia("only screen and (max-width: 760px)");
-
+/*! compost-client - v0.0.1-SNAPSHOT - 2015-11-07 */
 var compostServices = angular.module('compostServices', ['ngResource']);
 
 compostServices.factory('UserFoods', function($resource) {
@@ -152,6 +150,18 @@ compostServices.config(['$httpProvider', function($httpProvider) {
     $httpProvider.interceptors.push('authInterceptor');
 }]);
 
+function isMobile() {
+    return window.matchMedia("only screen and (max-width: 760px)").matches;
+}
+
+function momentFromIsoString(s) {
+    return moment(s);
+}
+
+function getDaysUntil(begin, end) {
+    return end.diff(begin, "days");
+}
+
 var authModule = angular.module("authModule", [
     "compostServices"
 ]);
@@ -214,10 +224,7 @@ editorModule.controller("EditorCtrl", function(
         return dest;
     };
 
-    console.log("Food:", JSON.parse($stateParams.food));
-    console.log("this.food:", this.food);
     this.food = this.food ? this.food : JSON.parse($stateParams.food);
-    console.log("this.food:", this.food);
     this.now = moment().startOf("day");
     this.original = this.copyTo(this.food, {});
     this.daysToExpiry = moment(this.food.expires).diff(this.now, 'days');
@@ -253,7 +260,7 @@ editorModule.controller("EditorCtrl", function(
 editorModule.factory("editorService", function(
     $rootScope, $q, $state, $mdDialog, authService) {
     var service = {
-        useDialog: !isMobile,
+        useDialog: !isMobile(),
         deferred: undefined,
         create: function() {
             var now = moment().startOf("day");
@@ -293,23 +300,24 @@ editorModule.factory("editorService", function(
             console.log('Transferring to editor page.');
             $state.go('app.foods.edit', {foodId: food.id,
                                          food: JSON.stringify(food)});
-            return deferred.promise;
+            return service.deferred.promise;
         },
         cancelEdit: function() {
             console.log("Canceled editing");
             if (service.useDialog) {
-                $state.go('app.foods');
-            } else {
                 $mdDialog.cancel();
+            } else {
+                service.deferred.reject("Canceled");
+                $state.go('app.foods');
             }
         },
         finishEdit: function(food) {
             if (service.useDialog) {
+                $mdDialog.hide(food);
+            } else {
                 service.deferred.resolve(food);
                 console.log("Done editing:", food);
                 $state.go('app.foods');
-            } else {
-                $mdDialog.hide(food);
             }
         }
     };
@@ -326,9 +334,9 @@ var foodListModule = angular.module("foodListModule", [
 
 var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
 
-/*
-  Controller for the food list view.
-*/
+/**
+ * Controller for the food list view.
+ */
 foodListModule.controller(
     "FoodListCtrl", function ($scope, authService, editorService, UserFoods) {
         authService.checkLogIn();
@@ -355,7 +363,7 @@ foodListModule.controller(
                 }.bind(this));
         };
 
-        // When an item is clicked, switch sides.
+        // When an item is clicked, select it.
         $scope.itemClicked = function (food) {
             if ($scope.selectedItem != food.id) {
                 $scope.selectedItem = food.id;
@@ -417,13 +425,36 @@ foodListModule.controller(
     }
 );
 
-function momentFromIsoString(s) {
-    return moment(s);
+function FoodModel(UserFoods) {
+    this.UserFoods_ = UserFoods_;
+    this.foods = {};
 }
 
-function getDaysUntil(begin, end) {
-    return end.diff(begin, "days");
-}
+FoodModel.prototype.load = function(id) {
+    if (id) {
+        UserFoods.get({id: id}, function(food) {
+            this.foods[food.id] = food;
+        });
+    } else {
+        UserFoods.query(function(result) {
+            for (var i in result) {
+                var food = result[i];
+                this.foods[food.id] = food;
+            }
+        }.bind(this));
+    }
+};
+
+FoodModel.prototype.get = function(id) {
+    return this.foods[id];
+};
+
+FoodModel.prototype.save = function() {
+    // TODO
+};
+
+angular.module('compost.FoodModel', ['compostServices'])
+    .service('FoodModel', FoodModel);
 
 var compostApp = angular.module("compostApp", [
     "ngRoute",
