@@ -35,7 +35,7 @@ compostApp.config([
                 views: {
                     'content@app': {
                         templateUrl: "partials/editor-page.html",
-                        controller: "EditorCtrl",
+                        controller: "EditorController",
                         controllerAs: "editorCtrl"
                     }
                 }

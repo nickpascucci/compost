@@ -150,12 +150,22 @@ compostServices.config(['$httpProvider', function($httpProvider) {
     $httpProvider.interceptors.push('authInterceptor');
 }]);
 
+/**
+ * Constants used among components in Compost.
+ */
+
+var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
+
 function isMobile() {
     return window.matchMedia("only screen and (max-width: 760px)").matches;
 }
 
 function momentFromIsoString(s) {
     return moment(s);
+}
+
+function momentToIsoString(m) {
+    return m.format("YYYY-MM-DD");
 }
 
 function getDaysUntil(begin, end) {
@@ -201,64 +211,57 @@ authModule.controller("AuthCtrl", function($scope, authService) {
     $scope.renderSignIn();
 });
 
-var editorModule = angular.module("editorModule", [
-    "ngMaterial"
-]);
-
-var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
-
-function momentToIsoString(m) {
-    return m.format("YYYY-MM-DD");
-}
-
-editorModule.controller("EditorCtrl", function(
-    $scope, $mdDialog, $stateParams, editorService) {
-
-    this.copyTo = function(source, dest) {
-        for (var property in source) {
-            if (source.hasOwnProperty(property) &&
-                property.indexOf('$') < 0) {
-                dest[property] = source[property];
-            }
-        }
-        return dest;
-    };
+function EditorController($scope, $mdDialog, $stateParams, EditorService) {
+    this.EditorService_ = EditorService;
 
     this.food = this.food ? this.food : JSON.parse($stateParams.food);
     this.now = moment().startOf("day");
     this.original = this.copyTo(this.food, {});
     this.daysToExpiry = moment(this.food.expires).diff(this.now, 'days');
+}
 
-    this.cancel = function() {
-        this.copyTo(this.original, this.food);
-        editorService.cancelEdit();
-    };
-
-    this.done = function() {
-        editorService.finishEdit(this.food);
-    };
-
-    this.onDaysToExpiryChanged = function () {
-        this.food.expires = momentToIsoString(
-            this.now.clone().add('days', this.daysToExpiry));
-    };
-
-    this.onFrozenStatusChanged = function () {
-        if (this.food['frozen?']) {
-            this.food['thaw-ttl-days'] = moment(this.food.expires).diff(this.now, "days");
-            this.food.expires = momentToIsoString(
-                this.now.clone().add("days", FREEZING_EXTENSION));
-            console.log("Food frozen", this.food);
-        } else {
-            this.food.expires = momentToIsoString(
-                this.now.clone().add("days", this.food["thaw-ttl-days"]));
-            console.log("Food thawed", this.food);
+EditorController.prototype.copyTo = function(source, dest) {
+    for (var property in source) {
+        if (source.hasOwnProperty(property) &&
+            property.indexOf('$') < 0) {
+            dest[property] = source[property];
         }
-    };
-});
+    }
+    return dest;
+};
 
-editorModule.factory("editorService", function(
-    $rootScope, $q, $state, $mdDialog, authService) {
+EditorController.prototype.cancel = function() {
+    this.copyTo(this.original, this.food);
+    this.EditorService_.cancelEdit();
+};
+
+EditorController.prototype.done = function() {
+    this.EditorService_.finishEdit(this.food);
+};
+
+EditorController.prototype.onDaysToExpiryChanged = function () {
+    this.food.expires = momentToIsoString(
+        this.now.clone().add('days', this.daysToExpiry));
+};
+
+EditorController.prototype.onFrozenStatusChanged = function () {
+    if (this.food['frozen?']) {
+        this.food['thaw-ttl-days'] = moment(this.food.expires).diff(this.now, "days");
+        this.food.expires = momentToIsoString(
+            this.now.clone().add("days", FREEZING_EXTENSION));
+        console.log("Food frozen", this.food);
+    } else {
+        this.food.expires = momentToIsoString(
+            this.now.clone().add("days", this.food["thaw-ttl-days"]));
+        console.log("Food thawed", this.food);
+    }
+};
+
+angular.module("editorModule", ["ngMaterial"])
+    .controller("EditorController", EditorController)
+    .service("EditorService", EditorService);
+
+function EditorService($rootScope, $q, $state, $mdDialog, authService) {
     var service = {
         useDialog: !isMobile(),
         deferred: undefined,
@@ -286,7 +289,7 @@ editorModule.factory("editorService", function(
             return $mdDialog.show({
                 clickOutsideToClose: true,
                 templateUrl: "partials/editor-dialog.html",
-                controller: "EditorCtrl",
+                controller: "EditorController",
                 controllerAs: "editorCtrl",
                 parent: angular.element(document.body),
                 locals: {
@@ -323,7 +326,7 @@ editorModule.factory("editorService", function(
     };
 
     return service;
-});
+}
 
 var foodListModule = angular.module("foodListModule", [
     "ngMaterial",
@@ -338,7 +341,7 @@ var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
  * Controller for the food list view.
  */
 foodListModule.controller(
-    "FoodListCtrl", function ($scope, authService, editorService, UserFoods) {
+    "FoodListCtrl", function ($scope, authService, EditorService, UserFoods) {
         authService.checkLogIn();
         this.scope_ = $scope;
 
@@ -354,7 +357,7 @@ foodListModule.controller(
         $scope.selectedItem = 0;
 
         $scope.addFood = function() {
-            editorService.create()
+            EditorService.create()
                 .then(function(food) {
                     console.log("Created", food);
                     UserFoods.save(food, function (saved) {
@@ -389,7 +392,7 @@ foodListModule.controller(
         };
 
         $scope.edit = function (food) {
-            editorService.edit(food)
+            EditorService.edit(food)
                 .then(function(edited) {
                     console.log("Done editing", edited);
                     edited.$save();
@@ -493,7 +496,7 @@ compostApp.config([
                 views: {
                     'content@app': {
                         templateUrl: "partials/editor-page.html",
-                        controller: "EditorCtrl",
+                        controller: "EditorController",
                         controllerAs: "editorCtrl"
                     }
                 }

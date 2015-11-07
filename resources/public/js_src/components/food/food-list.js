@@ -7,11 +7,11 @@ var foodListModule = angular.module("foodListModule", [
 
 var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
 
-/*
-  Controller for the food list view.
-*/
+/**
+ * Controller for the food list view.
+ */
 foodListModule.controller(
-    "FoodListCtrl", function ($scope, authService, editorService, UserFoods) {
+    "FoodListCtrl", function ($scope, authService, EditorService, UserFoods) {
         authService.checkLogIn();
         this.scope_ = $scope;
 
@@ -27,7 +27,7 @@ foodListModule.controller(
         $scope.selectedItem = 0;
 
         $scope.addFood = function() {
-            editorService.create()
+            EditorService.create()
                 .then(function(food) {
                     console.log("Created", food);
                     UserFoods.save(food, function (saved) {
@@ -36,7 +36,7 @@ foodListModule.controller(
                 }.bind(this));
         };
 
-        // When an item is clicked, switch sides.
+        // When an item is clicked, select it.
         $scope.itemClicked = function (food) {
             if ($scope.selectedItem != food.id) {
                 $scope.selectedItem = food.id;
@@ -62,7 +62,7 @@ foodListModule.controller(
         };
 
         $scope.edit = function (food) {
-            editorService.edit(food)
+            EditorService.edit(food)
                 .then(function(edited) {
                     console.log("Done editing", edited);
                     edited.$save();
@@ -97,11 +97,3 @@ foodListModule.controller(
         };
     }
 );
-
-function momentFromIsoString(s) {
-    return moment(s);
-}
-
-function getDaysUntil(begin, end) {
-    return end.diff(begin, "days");
-}
