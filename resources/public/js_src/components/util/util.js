@@ -1,15 +1,27 @@
-function isMobile() {
-    return window.matchMedia("only screen and (max-width: 760px)").matches;
-}
+var util = {};
 
-function momentFromIsoString(s) {
-    return moment(s);
-}
+util.isMobile = function() {
+  return window.matchMedia("only screen and (max-width: 760px)").matches;
+};
 
-function momentToIsoString(m) {
-    return m.format("YYYY-MM-DD");
-}
+util.momentFromIsoString = function(s) {
+  return moment(s);
+};
 
-function getDaysUntil(begin, end) {
-    return end.diff(begin, "days");
-}
+util.momentToIsoString = function(m) {
+  return m.format("YYYY-MM-DD");
+};
+
+util.getDaysUntil = function(begin, end) {
+  return end.diff(begin, "days");
+};
+
+util.copyTo = function(source, dest) {
+  for (var property in source) {
+    if (source.hasOwnProperty(property) &&
+        property.indexOf('$') < 0) {
+      dest[property] = source[property];
+    }
+  }
+  return dest;
+};

@@ -1,45 +1,33 @@
-function EditorController($scope, $mdDialog, $stateParams, EditorService) {
-    this.EditorService_ = EditorService;
+function EditorController($scope, $mdDialog, $stateParams, EditorService, FoodManager) {
+  this.EditorService_ = EditorService;
+  this.FoodManager_ = FoodManager;
 
-    this.food = this.food ? this.food : JSON.parse($stateParams.food);
-    this.now = moment().startOf("day");
-    this.original = this.copyTo(this.food, {});
-    this.daysToExpiry = moment(this.food.expires).diff(this.now, 'days');
+  this.id = this.id ? this.id : $stateParams.id;
+
+  this.EditorService_.beginAsyncEdit_();
+  this.FoodManager_.get(this.id).then(
+    function(food) {
+      this.food = food;
+      this.now = moment().startOf("day");
+      this.original = util.copyTo(food, {});
+      this.daysToExpiry = moment(food.expires).diff(this.now, 'days');
+      return food;
+    }.bind(this));
 }
 
-EditorController.prototype.copyTo = function(source, dest) {
-    for (var property in source) {
-        if (source.hasOwnProperty(property) &&
-            property.indexOf('$') < 0) {
-            dest[property] = source[property];
-        }
-    }
-    return dest;
-};
-
 EditorController.prototype.cancel = function() {
-    this.copyTo(this.original, this.food);
-    this.EditorService_.cancelEdit();
+  util.copyTo(this.original, this.food);
+  this.EditorService_.cancelEdit();
 };
 
 EditorController.prototype.done = function() {
-    this.EditorService_.finishEdit(this.food);
+  this.EditorService_.finishEdit(this.id);
 };
 
 EditorController.prototype.onDaysToExpiryChanged = function () {
-    this.food.expires = momentToIsoString(
-        this.now.clone().add('days', this.daysToExpiry));
+  this.food = this.FoodManager_.setDaysToExpiry(this.food, this.daysToExpiry);
 };
 
 EditorController.prototype.onFrozenStatusChanged = function () {
-    if (this.food['frozen?']) {
-        this.food['thaw-ttl-days'] = moment(this.food.expires).diff(this.now, "days");
-        this.food.expires = momentToIsoString(
-            this.now.clone().add("days", FREEZING_EXTENSION));
-        console.log("Food frozen", this.food);
-    } else {
-        this.food.expires = momentToIsoString(
-            this.now.clone().add("days", this.food["thaw-ttl-days"]));
-        console.log("Food thawed", this.food);
-    }
+  this.food = this.FoodManager_.setFrozenStatus(this.food, this.food['frozen?']);
 };

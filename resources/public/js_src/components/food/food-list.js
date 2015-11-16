@@ -1,8 +1,9 @@
 var foodListModule = angular.module("foodListModule", [
-    "ngMaterial",
-    "editorModule",
-    "authModule",
-    "compostServices"
+  "ngMaterial",
+  "editorModule",
+  "authModule",
+  "compostServices",
+  'compost.FoodManager'
 ]);
 
 var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
@@ -11,11 +12,14 @@ var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
  * Controller for the food list view.
  */
 foodListModule.controller(
-    "FoodListCtrl", function ($scope, authService, EditorService, UserFoods) {
+    "FoodListCtrl", function ($scope, authService, EditorService, FoodManager) {
         authService.checkLogIn();
         this.scope_ = $scope;
 
-        $scope.foods = UserFoods.query();
+        $scope.foods = [];
+        FoodManager.getAll().then(function (foods) {
+          $scope.foods = foods;
+        });
 
         $scope.getActiveFoods = function (foods) {
             return foods.filter(function(e, i, a) {
@@ -28,12 +32,13 @@ foodListModule.controller(
 
         $scope.addFood = function() {
             EditorService.create()
-                .then(function(food) {
+            .then(function(food) {
+              EditorService.edit(food); 
+            })
+            .then(function(food) {
                     console.log("Created", food);
-                    UserFoods.save(food, function (saved) {
-                        this.foods.push(saved);
-                    }.bind(this));
-                }.bind(this));
+                    this.foods = FoodManager.getAll();
+                  }.bind(this));
         };
 
         // When an item is clicked, select it.
@@ -63,10 +68,10 @@ foodListModule.controller(
 
         $scope.edit = function (food) {
             EditorService.edit(food)
-                .then(function(edited) {
-                    console.log("Done editing", edited);
-                    edited.$save();
-                }.bind(this));
+                .then(
+                  function(edited) {
+                    console.log("[fl] Done editing", edited);
+                  }.bind(this));
         };
 
         $scope.showNotes = function (food) {
@@ -79,11 +84,15 @@ foodListModule.controller(
         };
 
         $scope.getAge = function (food) {
-            return getDaysUntil(momentFromIsoString(food.created), moment().startOf("day"));
+            return util.getDaysUntil(
+              util.momentFromIsoString(food.created),
+              moment().startOf("day"));
         };
 
         $scope.getDaysToExpiry = function (food) {
-            return getDaysUntil(moment().startOf("day"), momentFromIsoString(food.expires));
+            return util.getDaysUntil(
+              moment().startOf("day"),
+              util.momentFromIsoString(food.expires));
         };
 
         $scope.getExpirationDate = function (food) {

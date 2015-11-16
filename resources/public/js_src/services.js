@@ -23,7 +23,7 @@ AuthService.prototype.logIn = function () {
             'callback': this.onSuccessfulLogin,
             'cookiepolicy': 'single_host_origin',
             'scope': 'profile',
-            'clientid': '564625248083-vrmpbbdr39uelvr3iirme4vuc5kckeu7.apps.googleusercontent.com',
+            'clientid': '564625248083-vrmpbbdr39uelvr3iirme4vuc5kckeu7.apps.googleusercontent.com'
         };
         console.log('Attempting login');
         gapi.auth.signIn(additionalParams);
@@ -111,6 +111,8 @@ AuthService.prototype.onSuccessfulLogin = function (result) {
 AuthService.prototype.getToken = function() {
     if (this.auth_info) {
         return this.auth_info.id_token;
+    } else {
+      return undefined;
     }
 };
 

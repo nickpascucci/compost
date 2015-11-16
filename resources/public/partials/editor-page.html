@@ -1,7 +1,7 @@
 <md-content
-   layout-margin layout="column" layout-align="space-between start"
+   layout="column" layout-align="space-between start"
    layout-fill>
-  <div layout="column" flex>
+  <div layout="column" layout-padding flex layout-fill>
     <md-input-container>
       <label>Name</label>
       <input ng-model="editorCtrl.food.name" type="text"/>
@@ -22,8 +22,9 @@
       Frozen
     </md-switch>
   </div>
-  <div class="md-actions">
+  <div class="md-actions" layout-fill layout="row">
     <md-button ng-click="editorCtrl.cancel()">Cancel</md-button>
+    <span flex></span>
     <md-button ng-click="editorCtrl.done()">Done</md-button>
   </div>
 </md-content>

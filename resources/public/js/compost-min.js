@@ -1,4 +1,4 @@
-/*! compost-client - v0.0.1-SNAPSHOT - 2015-11-07 */
+/*! compost-client - v0.0.1-SNAPSHOT - 2015-11-15 */
 var compostServices = angular.module('compostServices', ['ngResource']);
 
 compostServices.factory('UserFoods', function($resource) {
@@ -24,7 +24,7 @@ AuthService.prototype.logIn = function () {
             'callback': this.onSuccessfulLogin,
             'cookiepolicy': 'single_host_origin',
             'scope': 'profile',
-            'clientid': '564625248083-vrmpbbdr39uelvr3iirme4vuc5kckeu7.apps.googleusercontent.com',
+            'clientid': '564625248083-vrmpbbdr39uelvr3iirme4vuc5kckeu7.apps.googleusercontent.com'
         };
         console.log('Attempting login');
         gapi.auth.signIn(additionalParams);
@@ -112,6 +112,8 @@ AuthService.prototype.onSuccessfulLogin = function (result) {
 AuthService.prototype.getToken = function() {
     if (this.auth_info) {
         return this.auth_info.id_token;
+    } else {
+      return undefined;
     }
 };
 
@@ -156,21 +158,33 @@ compostServices.config(['$httpProvider', function($httpProvider) {
 
 var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
 
-function isMobile() {
-    return window.matchMedia("only screen and (max-width: 760px)").matches;
-}
+var util = {};
 
-function momentFromIsoString(s) {
-    return moment(s);
-}
+util.isMobile = function() {
+  return window.matchMedia("only screen and (max-width: 760px)").matches;
+};
 
-function momentToIsoString(m) {
-    return m.format("YYYY-MM-DD");
-}
+util.momentFromIsoString = function(s) {
+  return moment(s);
+};
 
-function getDaysUntil(begin, end) {
-    return end.diff(begin, "days");
-}
+util.momentToIsoString = function(m) {
+  return m.format("YYYY-MM-DD");
+};
+
+util.getDaysUntil = function(begin, end) {
+  return end.diff(begin, "days");
+};
+
+util.copyTo = function(source, dest) {
+  for (var property in source) {
+    if (source.hasOwnProperty(property) &&
+        property.indexOf('$') < 0) {
+      dest[property] = source[property];
+    }
+  }
+  return dest;
+};
 
 var authModule = angular.module("authModule", [
     "compostServices"
@@ -211,63 +225,52 @@ authModule.controller("AuthCtrl", function($scope, authService) {
     $scope.renderSignIn();
 });
 
-function EditorController($scope, $mdDialog, $stateParams, EditorService) {
-    this.EditorService_ = EditorService;
+function EditorController($scope, $mdDialog, $stateParams, EditorService, FoodManager) {
+  this.EditorService_ = EditorService;
+  this.FoodManager_ = FoodManager;
 
-    this.food = this.food ? this.food : JSON.parse($stateParams.food);
-    this.now = moment().startOf("day");
-    this.original = this.copyTo(this.food, {});
-    this.daysToExpiry = moment(this.food.expires).diff(this.now, 'days');
+  this.id = this.id ? this.id : $stateParams.id;
+
+  this.EditorService_.beginAsyncEdit_();
+  this.FoodManager_.get(this.id).then(
+    function(food) {
+      this.food = food;
+      this.now = moment().startOf("day");
+      this.original = util.copyTo(food, {});
+      this.daysToExpiry = moment(food.expires).diff(this.now, 'days');
+      return food;
+    }.bind(this));
 }
 
-EditorController.prototype.copyTo = function(source, dest) {
-    for (var property in source) {
-        if (source.hasOwnProperty(property) &&
-            property.indexOf('$') < 0) {
-            dest[property] = source[property];
-        }
-    }
-    return dest;
-};
-
 EditorController.prototype.cancel = function() {
-    this.copyTo(this.original, this.food);
-    this.EditorService_.cancelEdit();
+  util.copyTo(this.original, this.food);
+  this.EditorService_.cancelEdit();
 };
 
 EditorController.prototype.done = function() {
-    this.EditorService_.finishEdit(this.food);
+  this.EditorService_.finishEdit(this.id);
 };
 
 EditorController.prototype.onDaysToExpiryChanged = function () {
-    this.food.expires = momentToIsoString(
-        this.now.clone().add('days', this.daysToExpiry));
+  this.food = this.FoodManager_.setDaysToExpiry(this.food, this.daysToExpiry);
 };
 
 EditorController.prototype.onFrozenStatusChanged = function () {
-    if (this.food['frozen?']) {
-        this.food['thaw-ttl-days'] = moment(this.food.expires).diff(this.now, "days");
-        this.food.expires = momentToIsoString(
-            this.now.clone().add("days", FREEZING_EXTENSION));
-        console.log("Food frozen", this.food);
-    } else {
-        this.food.expires = momentToIsoString(
-            this.now.clone().add("days", this.food["thaw-ttl-days"]));
-        console.log("Food thawed", this.food);
-    }
+  this.food = this.FoodManager_.setFrozenStatus(this.food, this.food['frozen?']);
 };
 
-angular.module("editorModule", ["ngMaterial"])
-    .controller("EditorController", EditorController)
-    .service("EditorService", EditorService);
+angular.module('editorModule', ['ngMaterial', 'compost.FoodManager'])
+    .controller('EditorController', EditorController)
+    .service('EditorService', EditorService);
 
-function EditorService($rootScope, $q, $state, $mdDialog, authService) {
+function EditorService($rootScope, $q, $state, $mdDialog, authService, FoodManager) {
     this.q_ = $q;
     this.state_ = $state;
     this.mdDialog_ = $mdDialog;
     this.authService_ = authService;
+    this.FoodManager_ = FoodManager;
 
-    this.useDialog = !isMobile();
+    this.useDialog = !util.isMobile();
     this.deferred = undefined;
 }
 
@@ -275,25 +278,25 @@ EditorService.prototype.create = function() {
     var now = moment().startOf("day");
     var food = {
         "name": "New Food",
-        "created": momentToIsoString(now),
-        "expires": momentToIsoString(now),
+        "created": util.momentToIsoString(now),
+        "expires": util.momentToIsoString(now),
         "owner": this.authService_.getUserEmail(),
         "quantity": 1,
         "status": "active",
-        "frozen?": false,
+        "frozen?": false
     };
-    return this.edit(food);
+    return this.FoodManager_.add(food);
 };
 
 EditorService.prototype.edit = function(food) {
     if (this.useDialog) {
-        return this.editWithDialog(food);
+        return this.editWithDialog(food.id);
     } else {
-        return this.editWithPage(food);
+        return this.editWithPage(food.id);
     }
 };
 
-EditorService.prototype.editWithDialog = function(food) {
+EditorService.prototype.editWithDialog = function(id) {
     return this.mdDialog_.show({
         clickOutsideToClose: true,
         templateUrl: "partials/editor-dialog.html",
@@ -301,18 +304,26 @@ EditorService.prototype.editWithDialog = function(food) {
         controllerAs: "editorCtrl",
         parent: angular.element(document.body),
         locals: {
-            food: food
+            id: id
         },
         bindToController: true
-    });
+    }).then(
+      function() {
+        return this.FoodManager_.save(id);
+      }.bind(this));
 };
 
-EditorService.prototype.editWithPage = function(food) {
+EditorService.prototype.beginAsyncEdit_ = function() {
+  if (!this.deferred) {
     this.deferred = this.q_.defer();
+  }
+  return this.deferred.promise;
+};
+
+EditorService.prototype.editWithPage = function(id) {
     console.log('Transferring to editor page.');
-    this.state_.go('app.foods.edit', {foodId: food.id,
-                                 food: JSON.stringify(food)});
-    return this.deferred.promise;
+    this.state_.go('app.foods.edit', {id: id});
+    return this.beginAsyncEdit_();
 };
 
 EditorService.prototype.cancelEdit = function() {
@@ -325,21 +336,24 @@ EditorService.prototype.cancelEdit = function() {
     }
 };
 
-EditorService.prototype.finishEdit = function(food) {
-    if (this.useDialog) {
-        this.mdDialog_.hide(food);
-    } else {
-        this.deferred.resolve(food);
-        console.log("Done editing:", food);
-        this.state_.go('app.foods');
-    }
+EditorService.prototype.finishEdit = function(id) {
+  var food = this.FoodManager_.save(id);
+  if (this.useDialog) {
+    this.mdDialog_.hide(food);
+  } else {
+    this.deferred.resolve(food);
+    this.deferred = null;
+    console.log("[es] Done editing:", food);
+    this.state_.go('app.foods');
+  }
 };
 
 var foodListModule = angular.module("foodListModule", [
-    "ngMaterial",
-    "editorModule",
-    "authModule",
-    "compostServices"
+  "ngMaterial",
+  "editorModule",
+  "authModule",
+  "compostServices",
+  'compost.FoodManager'
 ]);
 
 var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
@@ -348,11 +362,14 @@ var FREEZING_EXTENSION = 60; // Freezing adds 60 days to food life
  * Controller for the food list view.
  */
 foodListModule.controller(
-    "FoodListCtrl", function ($scope, authService, EditorService, UserFoods) {
+    "FoodListCtrl", function ($scope, authService, EditorService, FoodManager) {
         authService.checkLogIn();
         this.scope_ = $scope;
 
-        $scope.foods = UserFoods.query();
+        $scope.foods = [];
+        FoodManager.getAll().then(function (foods) {
+          $scope.foods = foods;
+        });
 
         $scope.getActiveFoods = function (foods) {
             return foods.filter(function(e, i, a) {
@@ -365,12 +382,13 @@ foodListModule.controller(
 
         $scope.addFood = function() {
             EditorService.create()
-                .then(function(food) {
+            .then(function(food) {
+              EditorService.edit(food); 
+            })
+            .then(function(food) {
                     console.log("Created", food);
-                    UserFoods.save(food, function (saved) {
-                        this.foods.push(saved);
-                    }.bind(this));
-                }.bind(this));
+                    this.foods = FoodManager.getAll();
+                  }.bind(this));
         };
 
         // When an item is clicked, select it.
@@ -400,10 +418,10 @@ foodListModule.controller(
 
         $scope.edit = function (food) {
             EditorService.edit(food)
-                .then(function(edited) {
-                    console.log("Done editing", edited);
-                    edited.$save();
-                }.bind(this));
+                .then(
+                  function(edited) {
+                    console.log("[fl] Done editing", edited);
+                  }.bind(this));
         };
 
         $scope.showNotes = function (food) {
@@ -416,11 +434,15 @@ foodListModule.controller(
         };
 
         $scope.getAge = function (food) {
-            return getDaysUntil(momentFromIsoString(food.created), moment().startOf("day"));
+            return util.getDaysUntil(
+              util.momentFromIsoString(food.created),
+              moment().startOf("day"));
         };
 
         $scope.getDaysToExpiry = function (food) {
-            return getDaysUntil(moment().startOf("day"), momentFromIsoString(food.expires));
+            return util.getDaysUntil(
+              moment().startOf("day"),
+              util.momentFromIsoString(food.expires));
         };
 
         $scope.getExpirationDate = function (food) {
@@ -435,36 +457,128 @@ foodListModule.controller(
     }
 );
 
-function FoodModel(UserFoods) {
-    this.UserFoods_ = UserFoods_;
-    this.foods = {};
+function FoodManager($q, UserFoods) {
+  this.q_ = $q;
+  this.UserFoods_ = UserFoods;
+  this.foods = {};
+  this.reloadIfEmpty_();
 }
 
-FoodModel.prototype.load = function(id) {
-    if (id) {
-        UserFoods.get({id: id}, function(food) {
-            this.foods[food.id] = food;
-        });
-    } else {
-        UserFoods.query(function(result) {
-            for (var i in result) {
-                var food = result[i];
-                this.foods[food.id] = food;
-            }
-        }.bind(this));
+/**
+ * Get a food by ID.
+ * Returns a promise.
+ */
+FoodManager.prototype.get = function(id) {
+  if (this.foods[id]) {
+    var d = this.q_.defer();
+    d.resolve(this.foods[id]);
+    return d.promise;
+  }
+  return this.UserFoods_.get(
+    {id: id},
+    function(food) {
+      this.foods[food.id] = food;
+      return food;
+    }.bind(this)).$promise;
+};
+
+/**
+ * Get all of the foods.
+ */
+FoodManager.prototype.getAll = function() {
+  if (!this.isEmpty_()) {
+    var d = this.q_.defer();
+    var foodList = [];
+    for (var i in this.foods) {
+      foodList.push(this.foods[i]);
     }
+    d.resolve(foodList);
+    return d.promise;
+  } else {
+    return this.reload();
+  }
 };
 
-FoodModel.prototype.get = function(id) {
-    return this.foods[id];
+FoodManager.prototype.reloadIfEmpty_ = function() {
+  if (this.isEmpty_()) {
+    this.reload();
+  }
 };
 
-FoodModel.prototype.save = function() {
-    // TODO
+FoodManager.prototype.isEmpty_ = function() {
+  return Object.getOwnPropertyNames(this.foods).length === 0;
 };
 
-angular.module('compost.FoodModel', ['compostServices'])
-    .service('FoodModel', FoodModel);
+/**
+ * Load all of the foods from the backend.
+ */
+FoodManager.prototype.reload = function() {
+  console.log("Loading all foods");
+  return this.UserFoods_.query(
+    function(result) {
+      for (var i in result) {
+        var food = result[i];
+        this.foods[food.id] = food;
+      }
+    }.bind(this)).$promise;
+};
+
+/**
+ * Save a food by ID.
+ */
+FoodManager.prototype.save = function(id) {
+  if (this.foods[id]) {
+    if (this.foods[id].$save) {
+      return this.foods[id].$save();
+    } else {
+      return this.UserFoods_.save({}, this.foods[id]).$promise;
+    }
+  } else {
+    throw "No food matching ID " + id;
+  }
+};
+
+/**
+ * Add a new food to the list of managed foods.
+ */
+FoodManager.prototype.add = function(food) {
+  return this.UserFoods_.save({}, food).$promise
+         .then(function(saved) {
+           this.foods[saved.id] = saved;
+           return saved;
+         }.bind(this));
+};
+
+/**
+ * Set the days until a food expires.
+ */
+FoodManager.prototype.setDaysToExpiry = function (food, days) {
+  food.expires = util.momentToIsoString(
+      moment().startOf('day').add('days', days));
+  return food;
+};
+
+/**
+ * Set the frozen status of a food.
+ */
+FoodManager.prototype.setFrozenStatus = function (food, isFrozen) {
+  food['frozen?'] = isFrozen;
+  var now = moment().startOf('day');
+  if (food['frozen?']) {
+    food['thaw-ttl-days'] = moment(food.expires).diff(now, 'days');
+    food.expires = util.momentToIsoString(
+      now.clone().add('days', FREEZING_EXTENSION));
+    console.log('Food frozen', food);
+  } else {
+    food.expires = util.momentToIsoString(
+      now.clone().add('days', food['thaw-ttl-days']));
+    console.log('Food thawed', food);
+  }
+  return food;
+};
+
+angular.module('compost.FoodManager', ['compostServices'])
+.service('FoodManager', FoodManager);
 
 var compostApp = angular.module("compostApp", [
     "ngRoute",
@@ -499,7 +613,7 @@ compostApp.config([
                 }
             })
             .state("app.foods.edit", {
-                url: "/{foodId}/edit?food",
+                url: "/{id}/edit",
                 views: {
                     'content@app': {
                         templateUrl: "partials/editor-page.html",

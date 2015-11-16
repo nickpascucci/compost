@@ -1,3 +1,3 @@
-angular.module("editorModule", ["ngMaterial"])
-    .controller("EditorController", EditorController)
-    .service("EditorService", EditorService);
+angular.module('editorModule', ['ngMaterial', 'compost.FoodManager'])
+    .controller('EditorController', EditorController)
+    .service('EditorService', EditorService);

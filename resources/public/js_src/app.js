@@ -31,7 +31,7 @@ compostApp.config([
                 }
             })
             .state("app.foods.edit", {
-                url: "/{foodId}/edit?food",
+                url: "/{id}/edit",
                 views: {
                     'content@app': {
                         templateUrl: "partials/editor-page.html",
