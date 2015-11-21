@@ -17,7 +17,7 @@ function EditorController($scope, $mdDialog, $stateParams, EditorService, FoodMa
 
 EditorController.prototype.cancel = function() {
   util.copyTo(this.original, this.food);
-  this.EditorService_.cancelEdit();
+  this.EditorService_.cancelEdit(this.id);
 };
 
 EditorController.prototype.done = function() {

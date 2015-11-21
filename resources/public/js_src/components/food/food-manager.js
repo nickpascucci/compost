@@ -24,6 +24,17 @@ FoodManager.prototype.get = function(id) {
 };
 
 /**
+ * Delete a food.
+ */
+FoodManager.prototype.delete = function(id) {
+  return this.UserFoods_.delete(
+    {id: id},
+    function(food) {
+      delete this.foods[id];
+    }.bind(this)).$promise;
+};
+
+/**
  * Get all of the foods.
  */
 FoodManager.prototype.getAll = function() {
@@ -95,7 +106,7 @@ FoodManager.prototype.add = function(food) {
  */
 FoodManager.prototype.setDaysToExpiry = function (food, days) {
   food.expires = util.momentToIsoString(
-      moment().startOf('day').add('days', days));
+    moment().startOf('day').add('days', days));
   return food;
 };
 

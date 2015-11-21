@@ -61,12 +61,12 @@ EditorService.prototype.editWithPage = function(id) {
     return this.beginAsyncEdit_();
 };
 
-EditorService.prototype.cancelEdit = function() {
+EditorService.prototype.cancelEdit = function(id) {
     console.log("Canceled editing");
     if (this.useDialog) {
         this.mdDialog_.cancel();
     } else {
-        this.deferred.reject("Canceled");
+        this.deferred.reject({id: id, reason: "Canceled"});
         this.state_.go('app.foods');
     }
 };
