@@ -22,9 +22,10 @@ foodListModule.controller(
     });
 
     $scope.getActiveFoods = function (foods) {
-      return foods.filter(function(e, i, a) {
+      var active = foods.filter(function(e, i, a) {
         return e.status === "active";
       });
+      return active;
     };
 
     // ID of selected item.
@@ -32,16 +33,18 @@ foodListModule.controller(
 
     $scope.addFood = function() {
       EditorService.create()
-      .then(function(food) {
-        EditorService.edit(food);
-      })
-      .then(function(food) {
-        console.log("Created", food);
-        this.foods = FoodManager.getAll();
-      }.bind(this),
-            function(reason) {
-              FoodManager.delete(reason.id);
-            });
+        .then(function(food) {
+          return EditorService.edit(food);
+        }).then(function(food) {
+          console.log("Created", food);
+          FoodManager.getAll().then(function(foods) {
+            console.log("Found", foods.length, "foods");
+            $scope.foods = foods;
+          });
+        }.bind(this),
+        function(reason) {
+          FoodManager.delete(reason.id);
+        });
     };
 
     // When an item is clicked, select it.
