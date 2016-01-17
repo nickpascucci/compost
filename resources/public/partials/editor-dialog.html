@@ -20,6 +20,11 @@
       <input ng-model="editorCtrl.food.quantity"
              type="number" step="1"/>
     </md-input-container>
+    <md-input-container>
+      <label>Price per item</label>
+      <input ng-model="editorCtrl.food.price"
+             type="number" step="1.0"/>
+    </md-input-container>
     <md-switch ng-model="editorCtrl.food['frozen?']"
                ng-change="editorCtrl.onFrozenStatusChanged()">
       Frozen

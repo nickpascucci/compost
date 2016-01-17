@@ -26,7 +26,8 @@ compostApp.config([
                 views: {
                     'content': {
                         templateUrl: "partials/foods.html",
-                        controller: "FoodListCtrl"
+                        controller: "FoodListCtrl",
+                        controllerAs: "foodCtrl"
                     }
                 }
             })

@@ -16,22 +16,22 @@ foodListModule.controller(
     authService.checkLogIn();
     this.scope_ = $scope;
 
-    $scope.foods = [];
+    this.scope_.foods = [];
     FoodManager.getAll().then(function (foods) {
-      $scope.foods = foods;
-    });
+      this.scope_.foods = foods;
+    }.bind(this));
 
-    $scope.getActiveFoods = function (foods) {
+    // ID of selected item.
+    this.scope_.selectedItem = 0;
+
+    this.getActiveFoods = function (foods) {
       var active = foods.filter(function(e, i, a) {
         return e.status === "active";
       });
       return active;
     };
 
-    // ID of selected item.
-    $scope.selectedItem = 0;
-
-    $scope.addFood = function() {
+    this.addFood = function() {
       EditorService.create()
         .then(function(food) {
           return EditorService.edit(food);
@@ -39,8 +39,8 @@ foodListModule.controller(
           console.log("Created", food);
           FoodManager.getAll().then(function(foods) {
             console.log("Found", foods.length, "foods");
-            $scope.foods = foods;
-          });
+            this.scope_.foods = foods;
+          }).bind(this);
         }.bind(this),
         function(reason) {
           FoodManager.delete(reason.id);
@@ -48,16 +48,16 @@ foodListModule.controller(
     };
 
     // When an item is clicked, select it.
-    $scope.itemClicked = function (food) {
-      if ($scope.selectedItem != food.id) {
-        $scope.selectedItem = food.id;
+    this.itemClicked = function (food) {
+      if (this.scope_.selectedItem != food.id) {
+        this.scope_.selectedItem = food.id;
       } else {
-        $scope.selectedItem = 0;
+        this.scope_.selectedItem = 0;
       }
     };
 
     // When the "Remove" button is clicked, remove the element.
-    $scope.itemConsumed = function (food) {
+    this.itemConsumed = function (food) {
       console.log("Consumed one unit of", food);
       food.quantity--;
       if (food.quantity === 0) {
@@ -67,12 +67,12 @@ foodListModule.controller(
     };
 
     // TODO: Count a "consumed" removal separately from a "trashed" removal
-    $scope.itemRemoved = function (food) {
+    this.itemRemoved = function (food) {
       food.status = "trashed";
       food.$save();
     };
 
-    $scope.edit = function (food) {
+    this.edit = function (food) {
       EditorService.edit(food)
       .then(
         function(edited) {
@@ -80,35 +80,40 @@ foodListModule.controller(
         }.bind(this));
     };
 
-    $scope.showNotes = function (food) {
+    this.showNotes = function (food) {
       // TODO Handle showing notes
     };
 
-    $scope.getIsFrozen = function (food) {
+    this.getIsFrozen = function (food) {
       var frozen = false || food["frozen?"];
       return frozen;
     };
 
-    $scope.getAge = function (food) {
+    this.getAge = function (food) {
       return util.getDaysUntil(
         util.momentFromIsoString(food.created),
         moment().startOf("day"));
     };
 
-    $scope.getDaysToExpiry = function (food) {
+    this.getDaysToExpiry = function (food) {
       return util.getDaysUntil(
         moment().startOf("day"),
         util.momentFromIsoString(food.expires));
     };
 
-    $scope.getExpirationDate = function (food) {
-      if ($scope.getDaysToExpiry(food) === 0) {
+    this.getExpirationDate = function (food) {
+      if (this.getDaysToExpiry(food) === 0) {
         return "today";
-      } else if ($scope.getDaysToExpiry(food) == 1) {
+      } else if (this.getDaysToExpiry(food) == 1) {
         return "tomorrow";
       } else {
         return "on " + food.expires;
       }
+    };
+
+    this.getPrice = function (food) {
+      var price = food.price || 0;
+      return "" + price.toFixed(2);
     };
   }
 );

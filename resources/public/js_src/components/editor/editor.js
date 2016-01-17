@@ -18,7 +18,8 @@ EditorService.prototype.create = function() {
         "owner": this.authService_.getUserEmail(),
         "quantity": 1,
         "status": "active",
-        "frozen?": false
+        "frozen?": false,
+        "price": 0
     };
     return this.FoodManager_.add(food);
 };

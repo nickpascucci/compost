@@ -28,7 +28,9 @@
            (s/optional-key :quantity) (s/named Number "How many items there are")
            (s/optional-key :frozen?) (s/named Boolean "Whether this food is frozen")
            (s/optional-key :thaw-ttl-days)
-           (s/named Number "How long this food will last when thawed, in days")})
+           (s/named Number "How long this food will last when thawed, in days")
+           (s/optional-key :price)
+           (s/named Number  "How much this food costs, in dollars")})
 
 (def User {(s/optional-key :_id) (s/named String "The user's id")
            :email (s/named String "The user's email address")})

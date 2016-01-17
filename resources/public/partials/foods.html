@@ -1,58 +1,63 @@
 <div>
   <md-content flex layout-padding>
-    <div class="help-text" ng-if="getActiveFoods(foods).length == 0">
+    <div class="help-text"
+         ng-if="foodCtrl.getActiveFoods(foods).length == 0">
       There are no foods here! Click the "+" button below to add one.
     </div>
     <md-grid-list 
        md-cols-sm="1" md-cols-md="2" md-cols-lg="3" md-cols-gt-lg="4"
        md-gutter="15px" md-row-height="20em">
       <md-grid-tile md-rowspan="1" md-colspan="1"
-                    ng-repeat="food in getActiveFoods(foods) | orderBy : getDaysToExpiry"
-                    ng-click="itemClicked(food)">
+                    ng-repeat="food in foodCtrl.getActiveFoods(foods) |
+                               orderBy : foodCtrl.getDaysToExpiry"
+                    ng-click="foodCtrl.itemClicked(food)">
         <md-card layout-fill layout="column" layout-align="start start">
           <div ng-class="{'status': true,
-                         'expire-3': getDaysToExpiry(food) <= 1,
-                         'expire-2': getDaysToExpiry(food) > 1 && getDaysToExpiry(food) < 3,
-                         'expire-1': getDaysToExpiry(food) >= 3,
-                         'frozen': getIsFrozen(food)}"
+                         'expire-3': foodCtrl.getDaysToExpiry(food) <= 1,
+                         'expire-2': foodCtrl.getDaysToExpiry(food) > 1 &&
+                         foodCtrl.getDaysToExpiry(food) < 3,
+                         'expire-1': foodCtrl.getDaysToExpiry(food) >= 3,
+                         'frozen': foodCtrl.getIsFrozen(food)}"
                layout="row" layout-padding layout-align="start start" layout-fill>
             <div style="min-width: 48px; margin-right: 15px" layout-padding>
               <md-icon md-font-set="material-icons" class="md-light md-48"
-                       ng-show="getDaysToExpiry(food) <= 1">
+                       ng-show="foodCtrl.getDaysToExpiry(food) <= 1">
                 error_outline
               </md-icon>
               <md-icon md-font-set="material-icons" class="md-light md-48"
-                       ng-show="getDaysToExpiry(food) > 1 && getDaysToExpiry(food) < 3">
+                       ng-show="foodCtrl.getDaysToExpiry(food) > 1 &&
+                                foodCtrl.getDaysToExpiry(food) < 3">
                 warning
               </md-icon>
               <md-icon md-font-set="material-icons" class="md-light md-48"
-                       ng-show="getDaysToExpiry(food) >= 3">
+                       ng-show="foodCtrl.getDaysToExpiry(food) >= 3">
                 access_time
               </md-icon>
             </div>
             <div class="expire-time">
-              {{getDaysToExpiry(food)}} Days
+              {{foodCtrl.getDaysToExpiry(food)}} Days
             </div>
           </div>
           <md-card-content layout-padding flex layout-fill>
             <div layout="row">
               <h2>{{food.name}} <span ng-show="food['quantity']">({{food['quantity']}})</span></h2>
               <span flex> </span>
-              <md-button class="md-icon-button" ng-click="edit(food)">
+              <md-button class="md-icon-button" ng-click="foodCtrl.edit(food)">
                 <md-icon class="material-icons md-dark">
                   mode_edit
                 </md-icon>
               </md-button>
             </div>
-            <p>Expires {{getExpirationDate(food)}}</p>
-            <p>Added {{getAge(food)}} days ago</p>
+            <p>Expires {{foodCtrl.getExpirationDate(food)}}</p>
+            <p>${{foodCtrl.getPrice(food)}},
+              added {{foodCtrl.getAge(food)}} days ago</p>
           </md-card-content>
           <div layout="row" layout-align="start center" class="md-actions actions-bottom"
                layout-fill>
-            <md-button class="md-primary" ng-click="itemConsumed(food)">
+            <md-button class="md-primary" ng-click="foodCtrl.itemConsumed(food)">
               Eat <span ng-if="food['quantity'] > 1">One</span>
             </md-button>
-            <md-button ng-click="itemRemoved(food)">
+            <md-button ng-click="foodCtrl.itemRemoved(food)">
               Trash
             </md-button>
           </div>
@@ -62,7 +67,7 @@
     
   </md-content>
   <md-button class="md-primary md-fab md-fab-bottom-right md-accent fixed"
-             ng-click="addFood()">
+             ng-click="foodCtrl.addFood()">
     <md-icon class="material-icons md-light">add</md-icon>
   </md-button>
 </div>
